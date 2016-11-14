@@ -26,20 +26,26 @@ class Rep(apilib.Model):
     first_name = apilib.Field(apilib.String())
     last_name = apilib.Field(apilib.String())
     state_code = apilib.Field(apilib.String())
-    district_number = apilib.Field(apilib.Integer)
+    district_number = apilib.Field(apilib.Integer())
     district_code = apilib.Field(apilib.String())
     party_code = apilib.Field(apilib.Enum(Party.values()))
     chamber = apilib.Field(apilib.Enum(Chamber.values()))
+    email_link = apilib.Field(apilib.String())
     email = apilib.Field(apilib.String())
     website = apilib.Field(apilib.String())
     address_dc = apilib.Field(apilib.String())
     phone_dc = apilib.Field(apilib.String())
 
 class GetRepsRequest(apilib.Request):
-    latlng = apilib.Field(apilib.ModelType(LatLng), required=True)
+    latlng = apilib.Field(apilib.ModelType(LatLng), validators=[
+        apilib.ExactlyOneNonempty('latlng', 'district_code')])
+    district_code = apilib.Field(apilib.String(),  validators=[
+        apilib.ExactlyOneNonempty('latlng', 'district_code')])
 
 class GetRepsResponse(apilib.Response):
-    resp = apilib.Field(apilib.ListType(Rep))
+    house_rep = apilib.Field(apilib.ModelType(Rep))
+    senators = apilib.Field(apilib.ListType(Rep))
+    leadership = apilib.Field(apilib.ListType(Rep))
 
 class RepService(apilib.Service):
     path = '/rep_service'
