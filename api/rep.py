@@ -45,6 +45,7 @@ class Rep(apilib.Model):
     address_dc_lines = apilib.Field(apilib.ListType(apilib.String()))
     phone_dc = apilib.Field(apilib.String())
     status = apilib.Field(apilib.Enum(Status.values()))
+    photo_url = apilib.Field(apilib.String())
 
 class GetRepsRequest(apilib.Request):
     latlng = apilib.Field(apilib.ModelType(LatLng), validators=[

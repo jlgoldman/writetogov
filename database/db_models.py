@@ -70,3 +70,4 @@ class Rep(db.Model):
     phone_dc = db.Column(db.String(20))
     bioguide_id = db.Column(db.String(10))
     status = db.Column(db.String(1), index=True)
+    photo_url = db.Column(db.String(255))

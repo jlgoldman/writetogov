@@ -44,7 +44,8 @@ def db_rep_to_api(db_rep):
         address_dc=db_rep.address_dc,
         address_dc_lines=address_dc_lines,
         phone_dc=db_rep.phone_dc,
-        status=DB_STATUS_TO_API.get(db_rep.status))
+        status=DB_STATUS_TO_API.get(db_rep.status),
+        photo_url=db_rep.photo_url)
 
 def db_reps_to_api(db_reps):
     if not db_reps:
