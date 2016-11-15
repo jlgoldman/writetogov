@@ -8,6 +8,10 @@ def get_by_fips_code(fips_code):
 def get_by_state_code(state_code):
     return INFOS_BY_STATE_CODE.get(state_code)
 
+def get_state_name_for_code(state_code):
+    fips_info = get_by_state_code(state_code)
+    return fips_info.name if fips_info else None
+
 FIPS_INFOS = map(lambda t: FIPSInfo(*t), (
     ('Alabama',                    '01', 'AL'),
     ('Alaska',                     '02', 'AK'),
