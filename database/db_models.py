@@ -48,6 +48,12 @@ class Rep(db.Model):
     class Chamber(object):
         HOUSE = 'h'
         SENATE = 's'
+    class Status(object):
+        ACTIVE = 'a'
+        VACANT = 'v'
+        DEFEATED = 'd'
+        RETIRING = 'r'
+        PENDING_RESULT = 'p'
 
     rep_id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100))
@@ -63,3 +69,4 @@ class Rep(db.Model):
     address_dc = db.Column(db.String(255))
     phone_dc = db.Column(db.String(20))
     bioguide_id = db.Column(db.String(10))
+    status = db.Column(db.String(1), index=True)
