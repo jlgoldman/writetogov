@@ -15,7 +15,7 @@ class RepServiceTest(test_base.RealDatabaseTest):
             closing='Bob Smith\nSan Francisco, CA')
         resp = self.service().invoke('generate', req)
         self.assertEqual('SUCCESS', resp.response_code)
-        print resp.pdf_content
+        self.assertIsNotNone(resp.pdf_content)
 
 if __name__ == '__main__':
     unittest.main()

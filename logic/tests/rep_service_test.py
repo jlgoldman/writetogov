@@ -23,8 +23,8 @@ class RepServiceTest(test_base.RealDatabaseTest):
         self.assertEqual('Thompson', resp.house_rep.last_name)
         self.assertEqual('HOUSE', resp.house_rep.chamber)
         self.assertEqual('Representative', resp.house_rep.title)
-        self.assertEqual('231 Longworth House Office Building Washington DC 20515', resp.house_rep.address_dc)
-        self.assertEqual(['231 Longworth House Office Building', 'Washington DC 20515'],
+        self.assertEqual('231 Longworth House Office Building Washington DC, 20515', resp.house_rep.address_dc)
+        self.assertEqual(['231 Longworth House Office Building', 'Washington DC, 20515'],
             resp.house_rep.address_dc_lines)
 
         senators = sorted(resp.senators, key=lambda s: s.last_name)
