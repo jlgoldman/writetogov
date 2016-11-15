@@ -13,6 +13,14 @@ DB_CHAMBER_TO_TITLE = {
     R.Chamber.SENATE: 'Senator',
 }
 
+DB_STATUS_TO_API = {
+    R.Status.ACTIVE: rep.Rep.Status.ACTIVE,
+    R.Status.VACANT: rep.Rep.Status.VACANT,
+    R.Status.DEFEATED: rep.Rep.Status.DEFEATED,
+    R.Status.RETIRING: rep.Rep.Status.RETIRING,
+    R.Status.PENDING_RESULT: rep.Rep.Status.PENDING_RESULT,
+}
+
 def db_rep_to_api(db_rep):
     if not db_rep:
         return None
@@ -35,7 +43,8 @@ def db_rep_to_api(db_rep):
         website=db_rep.website,
         address_dc=db_rep.address_dc,
         address_dc_lines=address_dc_lines,
-        phone_dc=db_rep.phone_dc)
+        phone_dc=db_rep.phone_dc,
+        status=DB_STATUS_TO_API.get(db_rep.status))
 
 def db_reps_to_api(db_reps):
     if not db_reps:
