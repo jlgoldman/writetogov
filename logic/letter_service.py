@@ -20,18 +20,21 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         pass
 
     def generate(self, req):
+        html = self._generate_html(req)
+        pdf_buffer = _create_pdf(html)
+        return letter.GenerateLetterResponse(
+            pdf_content=pdf_buffer.getvalue())
+
+    def _generate_html(self, req):
         db_rep = R.query.get(req.rep_id)
         if not db_rep:
             raise _invalid_rep_id_exception(req.rep_id)
-        html = flask.render_template('pdf/letter.html',
+        return flask.render_template('pdf/letter.html',
             rep=db_to_api.db_rep_to_api(db_rep),
             body=req.body,
             closing=req.closing,
             date_str=_date_str(),
             pdf_font_file=constants.PDF_FONT_FILE)
-        pdf_buffer = _create_pdf(html)
-        return letter.GenerateLetterResponse(
-            pdf_content=pdf_buffer.getvalue())
 
     def process_unhandled_exception(self, exception):
         # For debugging
@@ -46,7 +49,11 @@ def _create_pdf(pdf_data):
     if type(pdf_data) != unicode:
         pdf_data = StringIO(pdf_data.encode('utf-8'))
     pdf = StringIO()
-    pisa.CreatePDF(pdf_data, dest=pdf, encoding='utf-8')
+    pisa.CreatePDF(
+        pdf_data,
+        dest=pdf,
+        link_callback=lambda uri, rel: uri,
+        encoding='utf-8')
     return pdf
 
 def _date_str():

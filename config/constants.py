@@ -16,7 +16,7 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/<my-project>'
 TEMPLATE_ROOT = os.path.join(PROJECTPATH, 'templates')
 STATIC_ROOT = os.path.join(PROJECTPATH, 'static')
 
-PDF_FONT_FILE = None
+PDF_FONT_FILE = os.path.join(PROJECTPATH, 'data/fonts/cmunrm.ttf')
 
 try:
     from constants_override import *
