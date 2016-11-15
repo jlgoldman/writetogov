@@ -30,6 +30,7 @@ class Rep(apilib.Model):
         RETIRING = 'RETIRING'
         PENDING_RESULT = 'PENDING_RESULT'
 
+    rep_id = apilib.Field(apilib.Integer())
     first_name = apilib.Field(apilib.String())
     last_name = apilib.Field(apilib.String())
     state_code = apilib.Field(apilib.String())
@@ -48,12 +49,18 @@ class Rep(apilib.Model):
     photo_url = apilib.Field(apilib.String())
 
 class GetRepsRequest(apilib.Request):
+    rep_ids = apilib.Field(apilib.ListType(apilib.Integer()), required=True)
+
+class GetRepsResponse(apilib.Response):
+    reps = apilib.Field(apilib.ListType(Rep))
+
+class LookupRepsRequest(apilib.Request):
     latlng = apilib.Field(apilib.ModelType(LatLng), validators=[
         apilib.ExactlyOneNonempty('latlng', 'district_code')])
     district_code = apilib.Field(apilib.String(),  validators=[
         apilib.ExactlyOneNonempty('latlng', 'district_code')])
 
-class GetRepsResponse(apilib.Response):
+class LookupRepsResponse(apilib.Response):
     house_rep = apilib.Field(apilib.ModelType(Rep))
     senators = apilib.Field(apilib.ListType(Rep))
     leadership = apilib.Field(apilib.ListType(Rep))
@@ -61,4 +68,5 @@ class GetRepsResponse(apilib.Response):
 class RepService(apilib.Service):
     path = '/rep_service'
     methods = apilib.servicemethods(
-        apilib.Meth('get', GetRepsRequest, GetRepsResponse))
+        apilib.Meth('get', GetRepsRequest, GetRepsResponse),
+        apilib.Meth('lookup', LookupRepsRequest, LookupRepsResponse))

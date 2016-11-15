@@ -19,6 +19,10 @@ class RepServiceImpl(rep.RepService, apilib.ServiceImplementation):
         pass
 
     def get(self, req):
+        db_reps = R.query.filter(R.rep_id.in_(req.rep_ids)).all()
+        return rep.GetRepsResponse(reps=db_to_api.db_reps_to_api(db_reps))
+
+    def lookup(self, req):
         if req.district_code:
             house_rep = _get_house_rep_by_district_code(req.district_code)
             state_code = req.district_code[:2]
@@ -29,7 +33,7 @@ class RepServiceImpl(rep.RepService, apilib.ServiceImplementation):
         senators = _get_senators_by_state_code(state_code)
         leadership = _get_leadership()
 
-        return rep.GetRepsResponse(
+        return rep.LookupRepsResponse(
             house_rep=db_to_api.db_rep_to_api(house_rep),
             senators=db_to_api.db_reps_to_api(senators),
             leadership=db_to_api.db_reps_to_api(leadership))

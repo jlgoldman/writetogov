@@ -30,6 +30,7 @@ def db_rep_to_api(db_rep):
         db_rep.address_dc[wash_dc_idx:],
     ]
     return rep.Rep(
+        rep_id=db_rep.rep_id,
         first_name=db_rep.first_name,
         last_name=db_rep.last_name,
         state_code=db_rep.state_code,
