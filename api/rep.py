@@ -30,10 +30,12 @@ class Rep(apilib.Model):
     district_code = apilib.Field(apilib.String())
     party_code = apilib.Field(apilib.Enum(Party.values()))
     chamber = apilib.Field(apilib.Enum(Chamber.values()))
+    title = apilib.Field(apilib.String())
     email_link = apilib.Field(apilib.String())
     email = apilib.Field(apilib.String())
     website = apilib.Field(apilib.String())
     address_dc = apilib.Field(apilib.String())
+    address_dc_lines = apilib.Field(apilib.ListType(apilib.String()))
     phone_dc = apilib.Field(apilib.String())
 
 class GetRepsRequest(apilib.Request):

@@ -16,6 +16,8 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/<my-project>'
 TEMPLATE_ROOT = os.path.join(PROJECTPATH, 'templates')
 STATIC_ROOT = os.path.join(PROJECTPATH, 'static')
 
+PDF_FONT_FILE = None
+
 try:
     from constants_override import *
 except ImportError:
