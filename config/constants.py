@@ -17,6 +17,7 @@ TEMPLATE_ROOT = os.path.join(PROJECTPATH, 'templates')
 STATIC_ROOT = os.path.join(PROJECTPATH, 'static')
 
 PDF_FONT_FILE = os.path.join(PROJECTPATH, 'data/fonts/cmunrm.ttf')
+REP_AUTOCOMPLETE_DATA_FNAME = os.path.join(PROJECTPATH, 'data/rep_autocomplete.20161115.json')
 
 try:
     from constants_override import *

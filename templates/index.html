@@ -1,15 +1,93 @@
 {% extends 'base.html' %}
 
-{% block ng_app %}indexApp{% endblock %}
+{% block ng_app %}mainApp{% endblock %}
 
-{% block title %}Title{% endblock %}
+{% block title %}WriteToGov - Write Your Elected Representatives{% endblock %}
 
 {% block content %}
-<div>Hello world</div>
+<ng-include src="'navbar-template'"></ng-include>
+
+<ng-view></ng-view>
 {% endblock %}
 
 {% block extra_scripts %}
+<script type="text/ng-template" id="navbar-template">
+  <md-toolbar>
+    <div layout="row" flex>
+      <div flex="30">
+        WriteToGov
+      </div>
+    </div>
+  </md-toolbar>
+</script>
+
+<script type="text/ng-template" id="index-template">
+  <div class="container index-container" ng-controller="IndexCtrl">
+    <div>
+      In this digital age, do something old-fashioned:
+      <br/>
+      Write and mail a letter to your elected representatives.
+      <br/><br/>
+      Enter your address to see who represents you
+    </div>
+
+    <div ng-show="state.searchMode == SearchMode.ADDRESS && !state.loading">
+      <input type="text" ng-model="form.address"
+        class="address-input" placeholder="Address"
+        google-place-autocomplete on-select="placeSelected($place)"/>
+
+      <div>
+        <a href="javascript:void(0)" ng-click="state.searchMode = SearchMode.TEXT">
+          Or search by representative name, state, or district
+        </a>
+      </div>
+    </div>
+
+    <div ng-show="state.searchMode == SearchMode.TEXT && !state.loading">
+      <div>Search by representative name, state name, or district</div>
+      <md-autocomplete
+        md-selected-item="form.selectedSearchItem"
+        md-search-text="form.searchText"
+        md-items="item in textSearch(form.searchText)"
+        md-item-text="item.name"
+        md-min-length="0"
+        placeholder="e.g. 'nancy pelosi', 'california', 'ca 12th'">
+        <md-item-template>
+          <span md-highlight-text="form.searchText" md-highlight-flags="i">
+            [[item.name]] - [[item.stateName]] [[item.title]] [[item.districtOrdinal ? ' - ' + item.districtOrdinal + ' district' : '']]
+          </span>
+        </md-item-template>
+      </md-autocomplete>
+
+    </div>
+    <md-progress-circular md-mode="indeterminate" ng-show="state.loading">
+    </md-progress-circular>
+  </div>
+</script>
+
+<script type="text/ng-template" id="district-template">
+  <div class="container district-container" ng-controller="DistrictCtrl">
+    <md-progress-circular md-mode="indeterminate" ng-show="state.loading">
+    </md-progress-circular>
+    <div ng-if="!state.loading">
+      [[repResults.houseRep['first_name'] ]] [[repResults.houseRep['last_name'] ]]
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="rep-page-template">
+  <div class="container district-container" ng-controller="RepPageCtrl">
+    <md-progress-circular md-mode="indeterminate" ng-show="state.loading">
+    </md-progress-circular>
+    <div ng-if="!state.loading">
+      [[rep['first_name'] ]] [[rep['last_name'] ]]
+    </div>
+  </div>
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+
 <script>
-  angular.module('indexApp', []);
+  initMain({{client_config | tojson}});
 </script>
 {% endblock %}

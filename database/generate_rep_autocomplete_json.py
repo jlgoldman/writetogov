@@ -19,6 +19,7 @@ def main():
             else:
                 district_ordinal = 'At-Large'
         rep_datas.append([
+            db_rep.rep_id,
             db_rep.first_name,
             db_rep.last_name,
             db_rep.state_code,

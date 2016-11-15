@@ -16,6 +16,12 @@ class WebViewsTest(test_base.RealDatabaseTest):
     def test_heartbeat(self):
         resp = self.client.get('/')
         self.assertEqual(200, resp.status_code)
+        resp = self.client.get('/district/CA11')
+        self.assertEqual(200, resp.status_code)
+        resp = self.client.get('/rep/12')
+        self.assertEqual(200, resp.status_code)
+        resp = self.client.get('/state/FL')
+        self.assertEqual(200, resp.status_code)
 
     def test_generate_letter_pdf(self):
         req = letter.GenerateLetterRequest(

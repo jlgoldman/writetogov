@@ -1,15 +1,24 @@
 import apilib
 import flask
+from flask import json
 from flask import render_template
 from flask import request
 
 from api import letter
 from app import app
+from config import constants
 from logic import letter_service
 
+AUTOCOMPLETE_DATA = json.load(open(constants.REP_AUTOCOMPLETE_DATA_FNAME))
+
 @app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/district/<district_code>')
+@app.route('/rep/<int:rep_id>')
+@app.route('/state/<state_code>')
+def index(district_code=None, rep_id=None, state_code=None):
+    return render_template('index.html', client_config=dict(
+        rep_autocomplete_data=AUTOCOMPLETE_DATA,
+        ))
 
 @app.route('/generate_letter', methods=['POST'])
 def generate_letter():
