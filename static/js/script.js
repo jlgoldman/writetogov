@@ -16,6 +16,11 @@ var RepStatus = {
   PENDING_RESULT: 'PENDING_RESULT'
 };
 
+var Frequency = {
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY'
+};
+
 function IndexCtrl($scope, $repService, $location, $repResults, $repAutocompleteData) {
   $scope.form = {
     address: null,
@@ -123,6 +128,13 @@ function RepPageCtrl($scope, $repService, $routeParams) {
   };
 
   this.init();
+}
+
+function ReminderCtrl($scope) {
+  $scope.form = {
+    email: null
+  };
+  $scope.Frequency = Frequency;
 }
 
 function RepResults(houseRep, senators, houseSpeaker, senateMajorityLeader) {
@@ -264,6 +276,7 @@ function initMain(clientConfig) {
     .controller('IndexCtrl', IndexCtrl)
     .controller('DistrictCtrl', DistrictCtrl)
     .controller('RepPageCtrl', RepPageCtrl)
+    .controller('ReminderCtrl', ReminderCtrl)
     .service('$repService', RepService)
     .directive('repCard', repCard)
     .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)

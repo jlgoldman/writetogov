@@ -34,12 +34,12 @@ a.header-link:hover {
   margin: auto;
 }
 
-.index-container .tagline-1 {
+.index-search-container .tagline-1 {
   text-align: center;
   font-size: 24px;
 }
 
-.index-container .tagline-2 {
+.index-search-container .tagline-2 {
   text-align: center;
   font-size: 36px;
 }
@@ -69,7 +69,7 @@ a.header-link:hover {
 }
 
 .address-input {
-   font-size: 14px;
+  font-size: 14px;
   box-sizing: border-box;
   border: none;
   box-shadow: none;
@@ -92,6 +92,58 @@ a.search-toggle-link:visited {
 
 a.search-toggle-link:hover {
   color: #555 !important;
+}
+
+.index-desc-container,
+.index-reminder-container {
+  background-color: #383D3B;
+  color: #fff;
+  text-align: center;
+}
+
+.container .center-text {
+  font-size: 18px;
+  max-width: 600px;
+  margin: auto;
+  text-align: left;
+}
+
+.index-how-it-works-container {
+  text-align: center;
+}
+
+.container .headline {
+  font-size: 24px;
+}
+
+/* Possibly due to https://github.com/angular/material/issues/6214
+ * the vertical alignment of a text and select input on the same line
+ * is broken */
+md-input-container.hide-error-msg .md-errors-spacer:empty {
+  display: none;
+}
+.reminder-form .hack-email-alignment {
+  position: relative;
+  top: 3px;
+}
+
+.index-reminder-container .reminder-form-panel {
+  font-size: 18px;
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+}
+
+.index-reminder-container .reminder-form {
+  text-align: left;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 2px;
+  color: rgba(0,0,0,0.87)
+}
+
+.index-reminder-container .reminder-form-panel .submit-button {
+  text-align: center;
 }
 
 h1.district-header {

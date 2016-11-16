@@ -14,7 +14,7 @@
 <script type="text/ng-template" id="navbar-template">
   <md-toolbar class="header-toolbar">
     <div layout="row" flex>
-      <div flex="30">
+      <div flex="70">
         <a href="/" class="header-link">
           <img src="/static/img/logo-white.svg" class="header-logo"/>
           Write to the Government
@@ -31,59 +31,128 @@
 </script>
 
 <script type="text/ng-template" id="index-template">
-  <div class="container index-container" ng-controller="IndexCtrl">
-    <div class="tagline-1">
-      In this digital age, do something old-fashioned:
-    </div>
-    <div class="tagline-2">
-      Write and mail a letter to your elected representatives.
-    </div>
+  <div ng-controller="IndexCtrl">
+    <div class="container index-search-container">
+      <div class="tagline-1">
+        In this digital age, do something old-fashioned:
+      </div>
+      <div class="tagline-2">
+        Write and mail a letter to your elected representatives.
+      </div>
 
-    <div class="search-panel">
-      <div ng-show="state.searchMode == SearchMode.ADDRESS && !state.loading">
-        <div>Enter your address to look up your representatives</div>
+      <div class="search-panel">
+        <div ng-show="state.searchMode == SearchMode.ADDRESS && !state.loading">
+          <div>Enter your address to look up your representatives</div>
 
-        <div class="address-input-wrapper">
-          <input type="text" ng-model="form.address"
-            class="address-input" placeholder="Address"
-            google-place-autocomplete on-select="placeSelected($place)"
-            autofocus/>
+          <div class="address-input-wrapper">
+            <input type="text" ng-model="form.address"
+              class="address-input" placeholder="Address"
+              google-place-autocomplete on-select="placeSelected($place)"
+              autofocus/>
+          </div>
+
+          <div class="search-toggle">
+            <a href="javascript:void(0)" ng-click="setSearchMode(SearchMode.TEXT)"
+              md-colors="{color:'primary'}" class="search-toggle-link">
+              Or search by representative name, state, or district
+            </a>
+          </div>
         </div>
 
-        <div class="search-toggle">
-          <a href="javascript:void(0)" ng-click="setSearchMode(SearchMode.TEXT)"
-            md-colors="{color:'primary'}" class="search-toggle-link">
-            Or search by representative name, state, or district
-          </a>
+        <div ng-show="state.searchMode == SearchMode.TEXT && !state.loading">
+          <div>Search by representative name, state name, or district</div>
+          <md-autocomplete
+            md-selected-item="form.selectedSearchItem"
+            md-search-text="form.searchText"
+            md-items="item in textSearch(form.searchText)"
+            md-item-text="item.name"
+            md-min-length="0"
+            placeholder="e.g. 'nancy pelosi', 'california', 'ca 12th'">
+            <md-item-template>
+              <span md-highlight-text="form.searchText" md-highlight-flags="i">
+                [[item.name]] - [[item.stateName]] [[item.title]] [[item.districtOrdinal ? ' - ' + item.districtOrdinal + ' district' : '']]
+              </span>
+            </md-item-template>
+          </md-autocomplete>
+          <div class="search-toggle">
+            <a href="javascript:void(0)" ng-click="setSearchMode(SearchMode.ADDRESS)"
+              md-colors="{color:'primary'}" class="search-toggle-link">
+              Or search by address
+            </a>
+          </div>
         </div>
       </div>
 
-      <div ng-show="state.searchMode == SearchMode.TEXT && !state.loading">
-        <div>Search by representative name, state name, or district</div>
-        <md-autocomplete
-          md-selected-item="form.selectedSearchItem"
-          md-search-text="form.searchText"
-          md-items="item in textSearch(form.searchText)"
-          md-item-text="item.name"
-          md-min-length="0"
-          placeholder="e.g. 'nancy pelosi', 'california', 'ca 12th'">
-          <md-item-template>
-            <span md-highlight-text="form.searchText" md-highlight-flags="i">
-              [[item.name]] - [[item.stateName]] [[item.title]] [[item.districtOrdinal ? ' - ' + item.districtOrdinal + ' district' : '']]
-            </span>
-          </md-item-template>
-        </md-autocomplete>
-        <div class="search-toggle">
-          <a href="javascript:void(0)" ng-click="setSearchMode(SearchMode.ADDRESS)"
-            md-colors="{color:'primary'}" class="search-toggle-link">
-            Or search by address
-          </a>
+      <md-progress-circular md-mode="indeterminate" ng-show="state.loading" class="center-progress">
+      </md-progress-circular>
+    </div>
+    <div class="container index-desc-container">
+      <div class="center-text">
+        <p>
+          Change is more likely to come for groups that are vocal. Our representatives
+          are tasked with listening to us and acting on our behalf but due to busyness,
+          complacency, and other factors too many of us don't reach out to our elected
+          officials.
+        </p>
+        <p>
+          If you have the passion to reach out to your representatives about an issue,
+          this tool can help make the process of contacting them as easy as possible.
+        </p>
+      </div>
+    </div>
+    <div class="container index-how-it-works-container">
+      <div class="headline">How it Works</div>
+      <div class="center-text">
+        <p>
+          Start by looking up who represents you. Enter your address to see the House
+          representative from your district and your two senators, as well as the
+          House and Senate leadership.
+        </p>
+        <p>
+          writetogov.com maintains a list of all representatives and their contact
+          information at their Washington DC office. (We are currently compiling a list
+          of contact info for local district offices and would love your help.)
+        </p>
+        <p>
+          You can then compose a brief letter here on the site, then merely click a
+          button to generate a properly-headed and addressed PDF which you can then
+          print and mail. Alternatively for maximum simplicity, for a small fee to
+          cover costs, we will print and send the letter for you, using lob.com.
+        </p>
+      </div>
+    </div>
+    <div class="container index-reminder-container" ng-controller="ReminderCtrl">
+      <div class="headline">
+        Maximize your impact by contacting your representatives regularly
+      </div>
+      <div class="reminder-form-panel">
+        <p>
+          Sign up to get a periodic reminder to write another letter:
+        </p>
+        <div class="md-inline-form reminder-form" layout="column">
+          <div layout="row" flex layout-align="center start">
+            <md-input-container flex="70" class="md-block hide-error-msg hack-email-alignment">
+              <label>Email</label>
+              <input type="text" ng-model="form.email"/>
+            </md-input-container>
+            <md-input-container flex="30" class="md-block">
+              <label>Frequency</label>
+              <md-select ng-model="form.frequency">
+                <md-option value="[[Frequency.WEEKLY]]">
+                  Weekly
+                </md-option>
+                <md-option value="[[Frequency.MONTHLY]]">
+                  Monthly
+                </md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+          <div class="submit-button">
+            <md-button class="md-primary md-raised">Submit</md-button>
+          </div>
         </div>
       </div>
     </div>
-
-    <md-progress-circular md-mode="indeterminate" ng-show="state.loading" class="center-progress">
-    </md-progress-circular>
   </div>
 </script>
 
