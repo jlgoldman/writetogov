@@ -119,6 +119,7 @@ function DistrictCtrl($scope, $repResults, $repService, $routeParams) {
 
 function RepPageCtrl($scope, $repService, $routeParams) {
   $scope.state = {loading: false};
+  $scope.rep = null;
 
   this.init = function() {
     $scope.state.loading = true;
@@ -137,6 +138,33 @@ function ReminderCtrl($scope) {
     email: null
   };
   $scope.Frequency = Frequency;
+}
+
+function ComposeCtrl($scope, $repService, $routeParams) {
+  $scope.state = {loading: false};
+  $scope.form = {
+    repId: $routeParams.repId,
+    body: null,
+    closing: null
+  };
+  $scope.currentDate = new Date();
+  $scope.rep = null;
+
+  this.init = function() {
+    $scope.state.loading = true;
+    $repService.getByRepId($routeParams.repId)
+      .then(function(response) {
+        $scope.state.loading = false;
+        $scope.rep = response.data['reps'][0]
+      });
+  };
+
+  $scope.isFormComplete = function() {
+    return $scope.form.body && $scope.form.body.trim()
+      && $scope.form.closing && $scope.form.closing.trim();
+  };
+
+  this.init();
 }
 
 function RepResults(houseRep, senators, houseSpeaker, senateMajorityLeader) {
@@ -188,7 +216,8 @@ function repCard() {
   return {
     scope: {
       rep: '=',
-      extraTitle: '@'
+      extraTitle: '@',
+      hideActions: '='
     },
     templateUrl: 'rep-card-template',
     controller: function($scope) {
@@ -261,6 +290,9 @@ function routeConfig($routeProvider, $locationProvider) {
     .when('/state/:stateCode', {
       templateUrl: 'state-template'
     })
+    .when('/compose/:repId', {
+      templateUrl: 'compose-template'
+    })
     .otherwise({
       templateUrl: 'index-template'
     });
@@ -285,6 +317,7 @@ function initMain(clientConfig) {
     .controller('DistrictCtrl', DistrictCtrl)
     .controller('RepPageCtrl', RepPageCtrl)
     .controller('ReminderCtrl', ReminderCtrl)
+    .controller('ComposeCtrl', ComposeCtrl)
     .service('$repService', RepService)
     .directive('repCard', repCard)
     .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)

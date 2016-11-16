@@ -15,6 +15,7 @@ AUTOCOMPLETE_DATA = json.load(open(constants.REP_AUTOCOMPLETE_DATA_FNAME))
 @app.route('/district/<district_code>')
 @app.route('/rep/<int:rep_id>')
 @app.route('/state/<state_code>')
+@app.route('/compose/<int:rep_id>')
 def index(district_code=None, rep_id=None, state_code=None):
     return render_template('index.html', client_config=dict(
         rep_autocomplete_data=AUTOCOMPLETE_DATA,
@@ -22,7 +23,10 @@ def index(district_code=None, rep_id=None, state_code=None):
 
 @app.route('/generate_letter', methods=['POST'])
 def generate_letter():
-    req = letter.GenerateLetterRequest(**request.json)
+    req = letter.GenerateLetterRequest(
+        rep_id=int(request.form['rep_id']),
+        body=request.form['body'],
+        closing=request.form['closing'])
     service = letter_service.LetterServiceImpl()
     resp = service.invoke('generate', req)
     if not resp.response_code == 'SUCCESS':
