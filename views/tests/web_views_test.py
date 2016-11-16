@@ -1,9 +1,7 @@
-import json
 import unittest
 
 import mock
 
-from api import letter
 from testing import test_base
 from views import web_views
 assert web_views  # Silence pyflakes
