@@ -24,6 +24,7 @@ a.header-link:visited,
 a.header-link:hover {
   text-decoration: none;
   color: #fff;
+  outline: 0;
 }
 
 .container {
@@ -170,13 +171,9 @@ h2.leadership-header {
   margin-top: 10px;
 }
 
-.compose-container h1,
-.compose-container h2,
-.compose-container h3 {
+h1.compose-page-title,
+h3.tips-title {
   font-weight: 400;
-}
-
-.compose-page-title {
   text-align: center;
 }
 
@@ -191,8 +188,21 @@ h2.leadership-header {
   box-shadow: 0 1px 3px 0 rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 2px 1px -1px rgba(0,0,0,.12);
 }
 
+.compose-header,
+.compose-wrapper textarea {
+  font-family: 'Lora', serif;
+}
+
+.compose-rep-card {
+  margin: auto;
+}
+
 .compose-header-section {
   margin-bottom: 16px;
+}
+
+.compose-column {
+  width: 100%;
 }
 
 .compose-column form.generate-form {

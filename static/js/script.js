@@ -56,7 +56,7 @@ function IndexCtrl($scope, $repService, $location, $repResults, $repAutocomplete
 
   $scope.$watch('form.selectedSearchItem', function(item, oldItem) {
     if (item !== oldItem) {
-      $location.path('/rep/' + item.repId);
+      $location.path('/compose/' + item.repId);
     };
   });
 
@@ -281,9 +281,6 @@ function RepService($http) {
 
 function routeConfig($routeProvider, $locationProvider) {
   $routeProvider
-    .when('/rep/:repId', {
-      templateUrl: 'rep-page-template'
-    })
     .when('/district/:districtCode', {
       templateUrl: 'district-template'
     })

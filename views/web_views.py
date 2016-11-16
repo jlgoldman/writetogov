@@ -13,7 +13,6 @@ AUTOCOMPLETE_DATA = json.load(open(constants.REP_AUTOCOMPLETE_DATA_FNAME))
 
 @app.route('/')
 @app.route('/district/<district_code>')
-@app.route('/rep/<int:rep_id>')
 @app.route('/state/<state_code>')
 @app.route('/compose/<int:rep_id>')
 def index(district_code=None, rep_id=None, state_code=None):

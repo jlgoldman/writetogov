@@ -198,11 +198,11 @@
     <md-progress-circular md-mode="indeterminate" ng-show="state.loading" class="center-progress">
     </md-progress-circular>
     <div ng-if="!state.loading">
-      <div layout="row" flex layout-align="center start">
-        <div flex="60" class="compose-column">
-          <h1 class="compose-page-title">
-            Write a letter to [[rep['first_name'] ]] [[rep['last_name'] ]]
-          </h1>
+      <h1 class="compose-page-title">
+        Write a letter to [[rep['first_name'] ]] [[rep['last_name'] ]]
+      </h1>
+      <div layout-gt-sm="row" layout="column" flex layout-align="center start">
+        <div flex-gt-sm="60" flex="100" class="compose-column" flex-order-gt-sm="1" flex-order="2">
           <div class="compose-wrapper">
             <div class="compose-header">
               <div class="compose-header-section">
@@ -242,11 +242,13 @@
             </md-button>
           </div>
         </div>
-        <div flex="40">
+        <div flex-gt-sm="40" flex="100" flex-order-gt-sm="2" flex-order="1" flex-offset-gt-sm="5">
           <div layout="column" layout-align="center start">
-            <rep-card rep="rep" hide-actions="true" margin-auto></rep-card>
+            <div class="compose-rep-card">
+              <rep-card rep="rep" hide-actions="true" margin-auto></rep-card>
+            </div>
             <div class="compose-tips">
-              <h3>Tips</h3>
+              <h3 class="tips-title">Tips</h3>
               <ul>
                 <li>Pick a single issue and keep the letter focused solely on that. Be brief.</li>
                 <li>State your central point clearly up front.</li>
@@ -256,8 +258,8 @@
                   see countless letters may help get you get heard.
                 </li>
                 <li>
-                  Put your full name and address to make your letter seem credible
-                  and to show that you are a constituent. Consider including your
+                  Put your full name and address to show that your letter is credible
+                  and that you are a constituent. Consider including your
                   phone number and email address as well.
                 </li>
               </ul>
