@@ -43,6 +43,7 @@ class Rep(apilib.Model):
     party_code = apilib.Field(apilib.Enum(Party.values()))
     chamber = apilib.Field(apilib.Enum(Chamber.values()))
     title = apilib.Field(apilib.String())
+    title_short = apilib.Field(apilib.String())
     email_link = apilib.Field(apilib.String())
     email = apilib.Field(apilib.String())
     website = apilib.Field(apilib.String())

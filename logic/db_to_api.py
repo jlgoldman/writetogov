@@ -13,6 +13,11 @@ DB_CHAMBER_TO_TITLE = {
     R.Chamber.SENATE: 'Senator',
 }
 
+DB_CHAMBER_TO_TITLE_SHORT = {
+    R.Chamber.HOUSE: 'Rep.',
+    R.Chamber.SENATE: 'Sen.',
+}
+
 DB_STATUS_TO_API = {
     R.Status.ACTIVE: rep.Rep.Status.ACTIVE,
     R.Status.LEFT_CONGRESS: rep.Rep.Status.LEFT_CONGRESS,
@@ -43,6 +48,7 @@ def db_rep_to_api(db_rep):
         party_code=db_rep.party_code,
         chamber=DB_CHAMBER_TO_API.get(db_rep.chamber),
         title=DB_CHAMBER_TO_TITLE.get(db_rep.chamber),
+        title_short=DB_CHAMBER_TO_TITLE_SHORT.get(db_rep.chamber),
         email_link=db_rep.email_link,
         email=db_rep.email,
         website=db_rep.website,
