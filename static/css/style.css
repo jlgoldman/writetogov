@@ -15,6 +15,17 @@ html, body {
   width: 100%;
 }
 
+h1.district-header {
+  text-align: center;
+  font-weight: 400;
+}
+
+h2.leadership-header {
+  text-align: center;
+  font-weight: 400;
+  padding-top: 30px;
+}
+
 .rep-card {
   width: 400px;
 }
@@ -26,4 +37,10 @@ html, body {
 
 .rep-card .phone {
   margin-top: 10px;
+}
+
+.footer-toolbar {
+  text-align: center;
+  height: 45px;
+  min-height: 45px;
 }

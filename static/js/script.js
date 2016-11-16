@@ -241,6 +241,13 @@ function routeConfig($routeProvider, $locationProvider) {
   $locationProvider.html5Mode(true);
 }
 
+function themeConfig($mdThemingProvider) {
+  $mdThemingProvider.theme('default')
+    .primaryPalette('blue-grey')
+    .accentPalette('orange')
+    .warnPalette('red');
+}
+
 var BRACKET_INTERPOLATOR = function ($interpolateProvider) {
   $interpolateProvider.startSymbol('[[');
   $interpolateProvider.endSymbol(']]');
@@ -256,5 +263,6 @@ function initMain(clientConfig) {
     .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)
     .value('$repResults', new RepResults())
     .value('$repAutocompleteData', clientConfig['rep_autocomplete_data'])
-    .config(routeConfig);
+    .config(routeConfig)
+    .config(themeConfig);
 }
