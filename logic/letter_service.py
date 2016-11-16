@@ -1,5 +1,6 @@
 from cStringIO import StringIO
 import datetime
+import re
 
 import apilib
 from dateutil import tz
@@ -15,6 +16,18 @@ from logic import db_to_api
 R = db_models.Rep
 
 TZ_EASTERN = tz.gettz('America/New_York')
+PHONE_RE = re.compile('(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})')
+EMAIL_RE = re.compile(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)')
+
+# xhtml2pdf logs errors like
+# "missing explicit frame definition for content or just static frames"
+# and it's unclear how to define frames to make this go away.
+# If you don't define a handler, Python's logging module complains
+# 'No handlers could be found for logger "xhtml2pdf"'
+# So we register a NullHandler to shut it all up.
+# If you want to see the actual warnings, change NullHandler to StreamHandler.
+import logging
+logging.getLogger('xhtml2pdf').addHandler(logging.NullHandler())
 
 class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
     def __init__(self, **kwargs):
@@ -34,7 +47,9 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
             rep=db_to_api.db_rep_to_api(db_rep),
             body=req.body,
             name_and_address=req.name_and_address,
+            sender_address=_make_sender_address(req.name_and_address),
             date_str=_date_str(),
+            include_address_page=True,
             pdf_font_file=constants.PDF_FONT_FILE)
 
     def process_unhandled_exception(self, exception):
@@ -59,6 +74,13 @@ def _create_pdf(pdf_data):
 
 def _date_str():
     return datetime.datetime.now(TZ_EASTERN).strftime('%B %-d, %Y')
+
+def _make_sender_address(name_and_address):
+    lines = []
+    for line in name_and_address.split('\r\n'):
+        if line and not PHONE_RE.search(line) and not EMAIL_RE.search(line):
+            lines.append(line)
+    return '\r\n'.join(lines)
 
 # xhtml2pdf supports css white-space but not pre-line or pre-wrap,
 # seemingly only pre. So we have to roll our own pre-line to get

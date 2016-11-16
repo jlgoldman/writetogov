@@ -1,3 +1,12 @@
+{% macro rep_address(rep) -%}
+  {{rep.title}} {{rep.first_name}} {{rep.last_name}}
+  <br/>
+  {% for line in rep.address_dc_lines %}
+    {{line}}
+    <br/>
+  {% endfor %}
+{%- endmacro %}
+
 <html>
 <head>
   <style>
@@ -7,6 +16,51 @@
     }
     body {
       font-family: 'CMU Serif';
+      font-size: 12pt;
+      text-align: justify;
+    }
+
+    @page {
+      size: letter;
+      margin: 1in;
+    }
+
+    @page address_page_template {
+      size: letter;
+
+      @frame sender_address_frame {
+         -pdf-frame-content: sender_address;
+        left: 26pt;
+        top: 275pt;
+      }
+
+      @frame recipient_address_frame {
+         -pdf-frame-content: recipient_address;
+        left: 0pt;
+        top: 350pt;
+      }
+
+      @frame stamp_outline_frame {
+         -pdf-frame-content: stamp_outline;
+        right: 26pt;
+        top: 275pt;
+        width: 26pt;
+        height: 26pt;
+        -pdf-frame-border: 1;
+      }
+    }
+
+    #sender_address {
+      font-size: 11pt;
+      line-height: 11pt;
+    }
+
+    #recipient_address {
+      text-align: center;
+    }
+
+    .page-break {
+      page-break-after: always;
     }
   </style>
 </head>
@@ -14,12 +68,7 @@
   {{date_str}}
   <br/><br/>
 
-  {{rep.title}} {{rep.first_name}} {{rep.last_name}}
-  <br/>
-  {% for line in rep.address_dc_lines %}
-    {{line}}
-    <br/>
-  {% endfor %}
+  {{rep_address(rep)}}
   <br/><br/>
 
   Dear {{rep.title}} {{rep.last_name}}:
@@ -30,5 +79,23 @@
 
   <br/><br/>
   {{name_and_address | newline_to_br}}
+
+  {% if include_address_page %}
+    <pdf:nexttemplate name="address_page_template" />
+    <!-- <pdf:nextpage/> -->
+    <div class="page-break"></div>
+    &nbsp;
+
+    <div id="sender_address">
+      {{sender_address | newline_to_br}}
+    </div>
+
+    <div id="recipient_address">
+      {{rep_address(rep)}}
+    </div>
+
+    <div id="stamp_outline">
+    </div>
+  {% endif %}
 </body>
 </html>
