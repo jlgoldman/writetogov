@@ -25,9 +25,11 @@ class Rep(apilib.Model):
 
     class Status(apilib.EnumValues):
         ACTIVE = 'ACTIVE'
-        VACANT = 'VACANT'
-        DEFEATED = 'DEFEATED'
+        LEFT_CONGRESS = 'LEFT_CONGRESS'
+        DEFEATED_IN_GENERAL = 'DEFEATED_IN_GENERAL'
+        DEFEATED_IN_PRIMARY = 'DEFEATED_IN_PRIMARY'
         RETIRING = 'RETIRING'
+        SEEKING_OTHER_OFFICE = 'SEEKING_OTHER_OFFICE'
         PENDING_RESULT = 'PENDING_RESULT'
 
     rep_id = apilib.Field(apilib.Integer())
@@ -48,6 +50,7 @@ class Rep(apilib.Model):
     address_dc_lines = apilib.Field(apilib.ListType(apilib.String()))
     phone_dc = apilib.Field(apilib.String())
     status = apilib.Field(apilib.Enum(Status.values()))
+    status_note = apilib.Field(apilib.String())
     photo_url = apilib.Field(apilib.String())
 
 class GetRepsRequest(apilib.Request):

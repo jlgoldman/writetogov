@@ -52,9 +52,11 @@ class Rep(db.Model):
         SENATE = 's'
     class Status(object):
         ACTIVE = 'a'
-        VACANT = 'v'
-        DEFEATED = 'd'
+        LEFT_CONGRESS = 'l'
+        DEFEATED_IN_GENERAL = 'd'
+        DEFEATED_IN_PRIMARY = 'e'
         RETIRING = 'r'
+        SEEKING_OTHER_OFFICE = 'o'
         PENDING_RESULT = 'p'
 
     rep_id = db.Column(db.Integer, primary_key=True)
@@ -72,6 +74,7 @@ class Rep(db.Model):
     phone_dc = db.Column(db.String(20))
     bioguide_id = db.Column(db.String(10))
     status = db.Column(db.String(1), index=True)
+    status_note = db.Column(db.String(100))
     photo_url = db.Column(db.String(255))
 
     def state_name(self):

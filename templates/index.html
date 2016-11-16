@@ -198,8 +198,8 @@
     <md-card-title>
       <md-card-title-text>
         <span class="md-headline">
-          <span ng-if="rep['status'] == RepStatus.VACANT">(Vacant)</span>
-          <span ng-if="rep['status'] != RepStatus.VACANT">[[rep['first_name'] ]] [[rep['last_name'] ]]</span>
+          <span ng-if="rep['status'] == RepStatus.LEFT_CONGRESS">(Vacant)</span>
+          <span ng-if="rep['status'] != RepStatus.LEFT_CONGRESS">[[rep['first_name'] ]] [[rep['last_name'] ]]</span>
         </span>
         <span ng-if="extraTitle" md-colors="{color:'accent'}">[[extraTitle]]</span>
         <span class="md-subhead">

@@ -15,9 +15,11 @@ DB_CHAMBER_TO_TITLE = {
 
 DB_STATUS_TO_API = {
     R.Status.ACTIVE: rep.Rep.Status.ACTIVE,
-    R.Status.VACANT: rep.Rep.Status.VACANT,
-    R.Status.DEFEATED: rep.Rep.Status.DEFEATED,
+    R.Status.LEFT_CONGRESS: rep.Rep.Status.LEFT_CONGRESS,
+    R.Status.DEFEATED_IN_GENERAL: rep.Rep.Status.DEFEATED_IN_GENERAL,
+    R.Status.DEFEATED_IN_PRIMARY: rep.Rep.Status.DEFEATED_IN_PRIMARY,
     R.Status.RETIRING: rep.Rep.Status.RETIRING,
+    R.Status.SEEKING_OTHER_OFFICE: rep.Rep.Status.SEEKING_OTHER_OFFICE,
     R.Status.PENDING_RESULT: rep.Rep.Status.PENDING_RESULT,
 }
 
@@ -48,6 +50,7 @@ def db_rep_to_api(db_rep):
         address_dc_lines=address_dc_lines,
         phone_dc=db_rep.phone_dc,
         status=DB_STATUS_TO_API.get(db_rep.status),
+        status_note=db_rep.status_note,
         photo_url=db_rep.photo_url)
 
 def db_reps_to_api(db_reps):

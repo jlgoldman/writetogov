@@ -74,3 +74,7 @@ FIPS_INFOS = map(lambda t: FIPSInfo(*t), (
 
 INFOS_BY_FIPS_CODE = {t[1]: t for t in FIPS_INFOS}
 INFOS_BY_STATE_CODE = {t[2]: t for t in FIPS_INFOS}
+
+ONE_DISTRICT_STATE_CODES = set([
+    'AK','AS','DC','DE','GU','MP','MT','ND','PR','SD','VI','VT','WY',
+    ])

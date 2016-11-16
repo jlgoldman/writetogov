@@ -10,9 +10,11 @@ var Chamber = {
 
 var RepStatus = {
   ACTIVE: 'ACTIVE',
-  VACANT: 'VACANT',
-  DEFEATED: 'DEFEATED',
+  LEFT_CONGRESS: 'LEFT_CONGRESS',
+  DEFEATED_IN_GENERAL: 'DEFEATED_IN_GENERAL',
+  DEFEATED_IN_PRIMARY: 'DEFEATED_IN_PRIMARY',
   RETIRING: 'RETIRING',
+  SEEKING_OTHER_OFFICE: 'SEEKING_OTHER_OFFICE',
   PENDING_RESULT: 'PENDING_RESULT'
 };
 
@@ -84,7 +86,7 @@ function IndexCtrl($scope, $repService, $location, $repResults, $repAutocomplete
     var items = _.map(matchingRows, function(row) {
       return {
         repId: row[0],
-        name: row[1] + ' ' + row[2],
+        name: row[1] ? row[1] + ' ' + row[2] : '(vacant)',
         stateName: row[4],
         districtOrdinal: row[7],
         title: row[8]
@@ -176,8 +178,10 @@ function RepResults(houseRep, senators, houseSpeaker, senateMajorityLeader) {
 
 function repCard() {
   var repStatusToMessage = {
-    'RETIRING': 'Retiring or seeking other office',
-    'DEFEATED': 'Defeated - term ends January 3',
+    'RETIRING': 'Retiring',
+    'DEFEATED_IN_GENERAL': 'Defeated - term ends January 3',
+    'DEFEATED_IN_PRIMARY': 'Defeated in primary - term ends January 3',
+    'SEEKING_OTHER_OFFICE': 'Seeking other office',
     'PENDING_RESULT': 'Re-election pending result'
   };
 
@@ -190,7 +194,11 @@ function repCard() {
     controller: function($scope) {
       $scope.RepStatus = RepStatus;
 
-      $scope.statusMessage = repStatusToMessage[$scope.rep['status']];
+      if ($scope.rep['status'] == RepStatus.LEFT_CONGRESS) {
+        $scope.statusMessage = $scope.rep['status_note'];
+      } else {
+        $scope.statusMessage = repStatusToMessage[$scope.rep['status']];
+      }
     }
   };
 }
