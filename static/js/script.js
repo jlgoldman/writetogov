@@ -321,5 +321,11 @@ function initMain(clientConfig) {
     .value('$repResults', new RepResults())
     .value('$repAutocompleteData', clientConfig['rep_autocomplete_data'])
     .config(routeConfig)
-    .config(themeConfig);
+    .config(themeConfig)
+    .config(function($mdGestureProvider) {
+      // See https://github.com/angular/material/issues/1441
+      // In this case, causes taps on Google Place Autocomplete
+      // results on mobile to be ignored without this.
+      $mdGestureProvider.skipClickHijack();
+    });
 }
