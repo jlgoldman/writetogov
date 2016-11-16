@@ -7,12 +7,91 @@ html, body {
   color: #191716;
 }
 
+.header-toolbar {
+  height: 60px;
+  min-height: 60px;
+  padding: 10px;
+}
+
+.header-logo {
+  width: 20px;
+  vertical-align: middle;
+}
+
+a.header-link,
+a.header-link:active,
+a.header-link:visited,
+a.header-link:hover {
+  text-decoration: none;
+  color: #fff;
+}
+
 .container {
   padding: 30px;
 }
 
+.center-progress {
+  margin: auto;
+}
+
+.index-container .tagline-1 {
+  text-align: center;
+  font-size: 24px;
+}
+
+.index-container .tagline-2 {
+  text-align: center;
+  font-size: 36px;
+}
+
+.search-panel {
+  margin: auto;
+  width: calc(100% - 40px);
+  max-width: 600px;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.address-input-wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
+  height: 40px;
+
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 2px 1px -1px rgba(0,0,0,.12);
+}
+
 .address-input {
+   font-size: 14px;
+  box-sizing: border-box;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  background: #fff;
   width: 100%;
+  padding: 0 15px;
+  line-height: 40px;
+  height: 40px;
+}
+
+.search-toggle {
+  margin-top: 30px;
+}
+
+a.search-toggle-link,
+a.search-toggle-link:visited {
+  text-decoration: none;
+}
+
+a.search-toggle-link:hover {
+  color: #555 !important;
 }
 
 h1.district-header {

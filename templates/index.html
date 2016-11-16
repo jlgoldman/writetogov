@@ -12,10 +12,13 @@
 
 {% block extra_scripts %}
 <script type="text/ng-template" id="navbar-template">
-  <md-toolbar>
+  <md-toolbar class="header-toolbar">
     <div layout="row" flex>
       <div flex="30">
-        <a href="/">WriteToGov</a>
+        <a href="/" class="header-link">
+          <img src="/static/img/logo-white.svg" class="header-logo"/>
+          Write to the Government
+        </a>
       </div>
     </div>
   </md-toolbar>
@@ -29,52 +32,64 @@
 
 <script type="text/ng-template" id="index-template">
   <div class="container index-container" ng-controller="IndexCtrl">
-    <div>
+    <div class="tagline-1">
       In this digital age, do something old-fashioned:
-      <br/>
+    </div>
+    <div class="tagline-2">
       Write and mail a letter to your elected representatives.
     </div>
 
-    <div ng-show="state.searchMode == SearchMode.ADDRESS && !state.loading">
-      <div>Enter your address to see who represents you</div>
+    <div class="search-panel">
+      <div ng-show="state.searchMode == SearchMode.ADDRESS && !state.loading">
+        <div>Enter your address to look up your representatives</div>
 
-      <input type="text" ng-model="form.address"
-        class="address-input" placeholder="Address"
-        google-place-autocomplete on-select="placeSelected($place)"
-        autofocus/>
+        <div class="address-input-wrapper">
+          <input type="text" ng-model="form.address"
+            class="address-input" placeholder="Address"
+            google-place-autocomplete on-select="placeSelected($place)"
+            autofocus/>
+        </div>
 
-      <div>
-        <a href="javascript:void(0)" ng-click="state.searchMode = SearchMode.TEXT">
-          Or search by representative name, state, or district
-        </a>
+        <div class="search-toggle">
+          <a href="javascript:void(0)" ng-click="setSearchMode(SearchMode.TEXT)"
+            md-colors="{color:'primary'}" class="search-toggle-link">
+            Or search by representative name, state, or district
+          </a>
+        </div>
+      </div>
+
+      <div ng-show="state.searchMode == SearchMode.TEXT && !state.loading">
+        <div>Search by representative name, state name, or district</div>
+        <md-autocomplete
+          md-selected-item="form.selectedSearchItem"
+          md-search-text="form.searchText"
+          md-items="item in textSearch(form.searchText)"
+          md-item-text="item.name"
+          md-min-length="0"
+          placeholder="e.g. 'nancy pelosi', 'california', 'ca 12th'">
+          <md-item-template>
+            <span md-highlight-text="form.searchText" md-highlight-flags="i">
+              [[item.name]] - [[item.stateName]] [[item.title]] [[item.districtOrdinal ? ' - ' + item.districtOrdinal + ' district' : '']]
+            </span>
+          </md-item-template>
+        </md-autocomplete>
+        <div class="search-toggle">
+          <a href="javascript:void(0)" ng-click="setSearchMode(SearchMode.ADDRESS)"
+            md-colors="{color:'primary'}" class="search-toggle-link">
+            Or search by address
+          </a>
+        </div>
       </div>
     </div>
 
-    <div ng-show="state.searchMode == SearchMode.TEXT && !state.loading">
-      <div>Search by representative name, state name, or district</div>
-      <md-autocomplete
-        md-selected-item="form.selectedSearchItem"
-        md-search-text="form.searchText"
-        md-items="item in textSearch(form.searchText)"
-        md-item-text="item.name"
-        md-min-length="0"
-        placeholder="e.g. 'nancy pelosi', 'california', 'ca 12th'">
-        <md-item-template>
-          <span md-highlight-text="form.searchText" md-highlight-flags="i">
-            [[item.name]] - [[item.stateName]] [[item.title]] [[item.districtOrdinal ? ' - ' + item.districtOrdinal + ' district' : '']]
-          </span>
-        </md-item-template>
-      </md-autocomplete>
-
-    </div>
-    <md-progress-circular md-mode="indeterminate" ng-show="state.loading">
+    <md-progress-circular md-mode="indeterminate" ng-show="state.loading" class="center-progress">
     </md-progress-circular>
   </div>
 </script>
 
 <script type="text/ng-template" id="district-template">
   <div class="container district-container" ng-controller="DistrictCtrl">
-    <md-progress-circular md-mode="indeterminate" ng-show="state.loading">
+    <md-progress-circular md-mode="indeterminate" ng-show="state.loading" class="center-progress">
     </md-progress-circular>
     <div ng-if="!state.loading">
       <h1 class="district-header">Your Representatives</h1>
@@ -99,10 +114,12 @@
 
 <script type="text/ng-template" id="rep-page-template">
   <div class="container district-container" ng-controller="RepPageCtrl">
-    <md-progress-circular md-mode="indeterminate" ng-show="state.loading">
+    <md-progress-circular md-mode="indeterminate" ng-show="state.loading" class="center-progress">
     </md-progress-circular>
     <div ng-if="!state.loading">
-      <rep-card rep="rep"></rep-card>
+      <div layout="row" layout-wrap layout-align="center none">
+        <rep-card rep="rep"></rep-card>
+      </div>
     </div>
   </div>
 </script>

@@ -25,7 +25,8 @@ function IndexCtrl($scope, $repService, $location, $repResults, $repAutocomplete
   };
   $scope.state = {
     loading: false,
-    searchMode: SearchMode.ADDRESS
+    searchMode: SearchMode.ADDRESS,
+    searchBoxFocused: false
   };
   $scope.SearchMode = SearchMode;
 
@@ -39,6 +40,11 @@ function IndexCtrl($scope, $repService, $location, $repResults, $repAutocomplete
         $repResults.updateFromLookupResponse(response.data);
         $location.path('/district/' + response.data['house_rep']['district_code']);
       });
+  };
+
+  $scope.setSearchMode = function(searchMode) {
+    $scope.state.searchMode = searchMode;
+    $scope.state.searchBoxFocused = true;
   };
 
   $scope.$watch('form.selectedSearchItem', function(item, oldItem) {
