@@ -5,6 +5,7 @@ import re
 import apilib
 from dateutil import tz
 import flask
+from PyPDF2 import PdfFileMerger
 from xhtml2pdf import pisa
 
 from api import letter
@@ -34,27 +35,49 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         pass
 
     def generate(self, req):
-        html = self._generate_html(req)
+        db_rep = R.query.get(req.rep_id)
+        html = self._generate_html(req, db_rep)
         pdf_buffer = _create_pdf(html)
+
+        if req.include_address_page:
+            address_page_html = self._generate_address_page_html(req, db_rep)
+            address_pdf_buffer = _create_pdf(address_page_html)
+            pdf_buffer = merge_pdf_buffers(pdf_buffer, address_pdf_buffer)
+
         return letter.GenerateLetterResponse(
             pdf_content=pdf_buffer.getvalue())
 
-    def _generate_html(self, req):
-        db_rep = R.query.get(req.rep_id)
+    def _generate_html(self, req, db_rep=None):
+        db_rep = db_rep or R.query.get(req.rep_id)
         if not db_rep:
             raise _invalid_rep_id_exception(req.rep_id)
         return flask.render_template('pdf/letter.html',
             rep=db_to_api.db_rep_to_api(db_rep),
             body=req.body,
             name_and_address=req.name_and_address,
-            sender_address=_make_sender_address(req.name_and_address),
             date_str=_date_str(),
-            include_address_page=True,
+            pdf_font_file=constants.PDF_FONT_FILE)
+
+    def _generate_address_page_html(self, req, db_rep=None):
+        db_rep = db_rep or R.query.get(req.rep_id)
+        if not db_rep:
+            raise _invalid_rep_id_exception(req.rep_id)
+        return flask.render_template('pdf/address_page.html',
+            rep=db_to_api.db_rep_to_api(db_rep),
+            sender_address=_make_sender_address(req.name_and_address),
             pdf_font_file=constants.PDF_FONT_FILE)
 
     def process_unhandled_exception(self, exception):
         # For debugging
         return True
+
+def merge_pdf_buffers(*buffers):
+    merger = PdfFileMerger()
+    for pdf_buffer in buffers:
+        merger.append(pdf_buffer)
+    output = StringIO()
+    merger.write(output)
+    return output
 
 def _invalid_rep_id_exception(rep_id):
     error = apilib.ApiError(code='UNKNOWN_REP', path='rep_id',

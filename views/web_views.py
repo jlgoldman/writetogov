@@ -25,7 +25,8 @@ def generate_letter():
     req = letter.GenerateLetterRequest(
         rep_id=int(request.form['rep_id']),
         body=request.form['body'],
-        name_and_address=request.form['name_and_address'])
+        name_and_address=request.form['name_and_address'],
+        include_address_page=True)
     service = letter_service.LetterServiceImpl()
     resp = service.invoke('generate', req)
     if not resp.response_code == 'SUCCESS':

@@ -1,0 +1,57 @@
+{% extends 'pdf/base.html' %}
+
+{% block extra_styles %}
+  @page {
+    size: letter;
+
+    @frame sender_address_frame {
+       -pdf-frame-content: sender_address;
+      left: 26pt;
+      top: 275pt;
+    }
+
+    @frame recipient_address_frame {
+       -pdf-frame-content: recipient_address;
+      left: 0pt;
+      top: 350pt;
+    }
+
+    @frame stamp_outline_frame {
+       -pdf-frame-content: stamp_outline;
+      right: 26pt;
+      top: 275pt;
+      width: 26pt;
+      height: 26pt;
+      -pdf-frame-border: 1;
+    }
+  }
+
+  #sender_address {
+    font-size: 11pt;
+    line-height: 11pt;
+  }
+
+  #recipient_address {
+    text-align: center;
+  }
+{% endblock %}
+
+{% block body %}
+  &nbsp;
+
+  <div id="sender_address">
+    {{sender_address | newline_to_br}}
+  </div>
+
+  <div id="recipient_address">
+    {{rep.title}} {{rep.first_name}} {{rep.last_name}}
+    <br/>
+    {% for line in rep.address_dc_lines %}
+      {{line}}
+      <br/>
+    {% endfor %}
+  </div>
+
+  <div id="stamp_outline">
+  </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+<html>
+<head>
+  <style>
+    @font-face {
+      font-family: 'CMU Serif';
+      src: url('{{pdf_font_file}}');
+    }
+    body {
+      font-family: 'CMU Serif';
+      font-size: 12pt;
+      text-align: justify;
+    }
+
+    @page {
+      size: letter;
+      margin: 1in;
+    }
+
+    {% block extra_styles %}
+    {% endblock %}
+  </style>
+</head>
+<body>
+  {% block body %}
+  {% endblock %}
+</body>
+</html>
