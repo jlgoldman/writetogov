@@ -34,12 +34,23 @@ def generate_letter():
         return 'There was an error generating your letter', response_code
     return flask.Response(resp.pdf_content, mimetype='application/pdf')
 
-# For debugging only
-@app.route('/letter_html')
-def letter_html():
-    req = letter.GenerateLetterRequest(
-        rep_id=61,
-        body=request.args.get('body'),
-        name_and_address=request.args.get('name_and_address'))
-    service = letter_service.LetterServiceImpl()
-    return service._generate_html(req)
+if constants.DEBUG:
+    # For debugging only
+    @app.route('/generate_letter_debug', methods=['POST'])
+    def generate_letter_debug():
+        req = letter.GenerateLetterRequest(
+            rep_id=int(request.form['rep_id']),
+            body=request.form['body'],
+            name_and_address=request.form['name_and_address'])
+        service = letter_service.LetterServiceImpl()
+        return service._generate_html(req)
+
+    # For debugging only
+    @app.route('/letter_html')
+    def letter_html():
+        req = letter.GenerateLetterRequest(
+            rep_id=61,
+            body=request.args.get('body'),
+            name_and_address=request.args.get('name_and_address'))
+        service = letter_service.LetterServiceImpl()
+        return service._generate_html(req)

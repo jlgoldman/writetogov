@@ -7,6 +7,7 @@ import flask
 from xhtml2pdf import pisa
 
 from api import letter
+from app import app
 from config import constants
 from database import db_models
 from logic import db_to_api
@@ -58,3 +59,13 @@ def _create_pdf(pdf_data):
 
 def _date_str():
     return datetime.datetime.now(TZ_EASTERN).strftime('%B %-d, %Y')
+
+# xhtml2pdf supports css white-space but not pre-line or pre-wrap,
+# seemingly only pre. So we have to roll our own pre-line to get
+# both wrapping and newlines.
+@app.template_filter('newline_to_br')
+def newline_to_br(s):
+    s = s or ''
+    escaped = unicode(app.jinja_env.filters['escape'](s))
+    replaced = escaped.replace('\r\n', '<br/>')
+    return app.jinja_env.filters['safe'](replaced)
