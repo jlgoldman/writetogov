@@ -3,6 +3,19 @@ var SearchMode = {
   TEXT: 2
 };
 
+var Chamber = {
+  HOUSE: 'HOUSE',
+  SENATE: 'SENATE'
+};
+
+var RepStatus = {
+  ACTIVE: 'ACTIVE',
+  VACANT: 'VACANT',
+  DEFEATED: 'DEFEATED',
+  RETIRING: 'RETIRING',
+  PENDING_RESULT: 'PENDING_RESULT'
+};
+
 function IndexCtrl($scope, $repService, $location, $repResults, $repAutocompleteData) {
   $scope.form = {
     address: null,
@@ -19,10 +32,11 @@ function IndexCtrl($scope, $repService, $location, $repResults, $repAutocomplete
   $scope.placeSelected = function(place) {
     $scope.state.loading = true;
     var location = place.geometry.location;
+    $repResults.clear();
     $repService.lookupByLatLng(location.lat(), location.lng())
       .then(function(response) {
         $scope.state.loading = false;
-        $repResults.fromLookupResponse(response.data);
+        $repResults.updateFromLookupResponse(response.data);
         $location.path('/district/' + response.data['house_rep']['district_code']);
       });
   };
@@ -78,10 +92,11 @@ function DistrictCtrl($scope, $repResults, $repService, $routeParams) {
   this.init = function() {
     if (!$repResults.houseRep) {
       $scope.state.loading = true;
+      $repResults.clear();
       $repService.lookupByDistrictCode($routeParams.districtCode)
         .then(function(response) {
           $scope.state.loading = false;
-          $repResults.fromLookupResponse(response.data);
+          $repResults.updateFromLookupResponse(response.data);
         });
     };
   };
@@ -104,21 +119,61 @@ function RepPageCtrl($scope, $repService, $routeParams) {
   this.init();
 }
 
-function RepResults(houseRep, senators, leadership) {
+function RepResults(houseRep, senators, houseSpeaker, senateMajorityLeader) {
   this.houseRep = houseRep;
   this.senators = senators || [];
-  this.leadership = leadership || [];
+  this.houseSpeaker = houseSpeaker;
+  this.senateMajorityLeader = senateMajorityLeader;
 
-  this.fromLookupResponse = function(data) {
+  this.updateFromLookupResponse = function(data) {
+    this.clear();
+
     this.houseRep = data['house_rep'];
     this.senators = data['senators'] || [];
-    this.leadership = data['leadership'] || [];
+
+    var houseSpeaker = _.find(data['leadership'], function(rep) {
+      return rep['chamber'] == Chamber.HOUSE;
+    });
+    if (!houseSpeaker || !this.houseRep || houseSpeaker['rep_id'] != this.houseRep['rep_id']) {
+      this.houseSpeaker = houseSpeaker;
+    }
+
+    var senMaj = _.find(data['leadership'], function(rep) {
+      return rep['chamber'] == Chamber.SENATE;
+    });
+    if (!senMaj || _.isEmpty(this.senators)
+      || (senMaj['rep_id'] != this.senators[0]['rep_id']
+        && senMaj['rep_id'] != this.senators[1]['rep_id'])) {
+      this.senateMajorityLeader = senMaj;
+    }
   };
 
   this.clear = function() {
     this.houseRep = null;
     this.senators = [];
-    this.leadership = [];
+    this.houseSpeaker = null;
+    this.senateMajorityLeader = null;
+  };
+}
+
+function repCard() {
+  var repStatusToMessage = {
+    'RETIRING': 'Retiring or seeking other office',
+    'DEFEATED': 'Defeated - term ends January 3',
+    'PENDING_RESULT': 'Re-election pending result'
+  };
+
+  return {
+    scope: {
+      rep: '=',
+      extraTitle: '@'
+    },
+    templateUrl: 'rep-card-template',
+    controller: function($scope) {
+      $scope.RepStatus = RepStatus;
+
+      $scope.statusMessage = repStatusToMessage[$scope.rep['status']];
+    }
   };
 }
 
@@ -197,6 +252,7 @@ function initMain(clientConfig) {
     .controller('DistrictCtrl', DistrictCtrl)
     .controller('RepPageCtrl', RepPageCtrl)
     .service('$repService', RepService)
+    .directive('repCard', repCard)
     .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)
     .value('$repResults', new RepResults())
     .value('$repAutocompleteData', clientConfig['rep_autocomplete_data'])

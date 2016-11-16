@@ -2,6 +2,8 @@ from geoalchemy2 import Geography
 from sqlalchemy.dialects import postgresql
 
 from database import db
+from util import fips
+from util import text
 
 SRID = 4326
 
@@ -71,3 +73,11 @@ class Rep(db.Model):
     bioguide_id = db.Column(db.String(10))
     status = db.Column(db.String(1), index=True)
     photo_url = db.Column(db.String(255))
+
+    def state_name(self):
+        return fips.get_state_name_for_code(self.state_code)
+
+    def district_ordinal(self):
+        if self.chamber == self.Chamber.HOUSE:
+            return text.ordinal(self.district_number) if self.district_number > 0 else 'At-Large'
+        return None
