@@ -32,7 +32,7 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         return flask.render_template('pdf/letter.html',
             rep=db_to_api.db_rep_to_api(db_rep),
             body=req.body,
-            closing=req.closing,
+            name_and_address=req.name_and_address,
             date_str=_date_str(),
             pdf_font_file=constants.PDF_FONT_FILE)
 

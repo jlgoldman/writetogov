@@ -224,14 +224,14 @@
             </md-input-container>
             <md-input-container class="md-block">
               <label>Your Name and Address</label>
-              <textarea ng-model="form.closing" rows="5"></textarea>
+              <textarea ng-model="form.nameAndAddress" rows="5"></textarea>
             </md-input-container>
           </div>
           <div class="compose-button-panel">
             <form action="/generate_letter" method="POST" target="_blank" class="generate-form">
               <input type="text" ng-model="form.repId" style="display:none" name="rep_id"/>
               <textarea ng-model="form.body" style="display:none" name="body"></textarea>
-              <textarea ng-model="form.closing" style="display:none" name="closing"></textarea>
+              <textarea ng-model="form.nameAndAddress" style="display:none" name="name_and_address"></textarea>
               <md-button class="md-raised md-primary" type="submit"
                 ng-disabled="!isFormComplete()">
                 Generate PDF to Print

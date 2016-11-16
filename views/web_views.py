@@ -25,7 +25,7 @@ def generate_letter():
     req = letter.GenerateLetterRequest(
         rep_id=int(request.form['rep_id']),
         body=request.form['body'],
-        closing=request.form['closing'])
+        name_and_address=request.form['name_and_address'])
     service = letter_service.LetterServiceImpl()
     resp = service.invoke('generate', req)
     if not resp.response_code == 'SUCCESS':
@@ -40,6 +40,6 @@ def letter_html():
     req = letter.GenerateLetterRequest(
         rep_id=61,
         body=request.args.get('body'),
-        closing=request.args.get('closing'))
+        name_and_address=request.args.get('name_and_address'))
     service = letter_service.LetterServiceImpl()
     return service._generate_html(req)

@@ -145,7 +145,7 @@ function ComposeCtrl($scope, $repService, $routeParams) {
   $scope.form = {
     repId: $routeParams.repId,
     body: null,
-    closing: null
+    nameAndAddress: null
   };
   $scope.currentDate = new Date();
   $scope.rep = null;
@@ -161,7 +161,7 @@ function ComposeCtrl($scope, $repService, $routeParams) {
 
   $scope.isFormComplete = function() {
     return $scope.form.body && $scope.form.body.trim()
-      && $scope.form.closing && $scope.form.closing.trim();
+      && $scope.form.nameAndAddress && $scope.form.nameAndAddress.trim();
   };
 
   this.init();

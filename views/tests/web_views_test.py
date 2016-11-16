@@ -21,7 +21,7 @@ class WebViewsTest(test_base.RealDatabaseTest):
         resp = self.client.post('/generate_letter', data=dict(
             rep_id='61',
             body='hello world',
-            closing='Bob Smith\nSan Francisco, CA'))
+            name_and_address='Bob Smith\nSan Francisco, CA'))
         self.assertEqual(200, resp.status_code)
         self.assertEqual('application/pdf', resp.headers.get('Content-Type'))
         self.assertIsNotNone(resp.data)
@@ -31,7 +31,7 @@ class WebViewsTest(test_base.RealDatabaseTest):
         resp = self.client.post('/generate_letter', data=dict(
             rep_id='-1',
             body='hello world',
-            closing='Bob Smith\nSan Francisco, CA'))
+            name_and_address='Bob Smith\nSan Francisco, CA'))
         self.assertEqual(400, resp.status_code)
         mock_log_error.assert_called_once()
 

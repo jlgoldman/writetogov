@@ -7,7 +7,7 @@ def main():
     req = letter.GenerateLetterRequest(
         rep_id=61,
         body='hello world',
-        closing='Bob Smith\nSan Francisco, CA')
+        name_and_address='Bob Smith\nSan Francisco, CA')
     service = letter_service.LetterServiceImpl()
     resp = service.invoke('generate', req)
     output_filename = 'debug-letter-%d.pdf' % random.uniform(1, 1000000)

@@ -12,7 +12,7 @@ class RepServiceTest(test_base.RealDatabaseTest):
         req = letter.GenerateLetterRequest(
             rep_id=61,
             body='hello world',
-            closing='Bob Smith\nSan Francisco, CA')
+            name_and_address='Bob Smith\nSan Francisco, CA')
         resp = self.service().invoke('generate', req)
         self.assertEqual('SUCCESS', resp.response_code)
         self.assertIsNotNone(resp.pdf_content)
