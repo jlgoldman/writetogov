@@ -150,7 +150,20 @@
             </md-input-container>
           </div>
           <div class="submit-button">
-            <md-button class="md-primary md-raised">Submit</md-button>
+            <md-button class="md-primary md-raised" ng-click="submit()"
+              ng-disabled="!formValid() || submitting || success">
+              Submit
+            </md-button>
+          </div>
+          <md-progress-circular md-mode="indeterminate" ng-show="submitting" class="center-progress">
+          </md-progress-circular>
+          <div ng-if="success" md-colors="{color:'primary'}">
+            Thank you for signing up for reminders! You'll receive an email each
+            [[form.frequency == Frequency.WEEKLY ? 'week' : 'month']]
+            with a link to return and write another letter. You may opt out any time.
+          </div>
+          <div ng-if="error" md-colors="{color:'warn'}">
+            There was an error subscribing you for reminders. Please try again.
           </div>
         </div>
       </div>

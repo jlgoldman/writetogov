@@ -8,7 +8,6 @@ from util import patches
 assert patches  # Silence pyflakes
 
 _real_db_app_configured = False
-_fake_db_app_configured = False
 
 class RealDatabaseTest(flask_testing.TestCase):
     def create_app(self):

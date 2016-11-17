@@ -121,11 +121,33 @@ function DistrictCtrl($scope, $repResults, $repService, $preloadData, $routePara
   }
 }
 
-function ReminderCtrl($scope) {
+function ReminderCtrl($scope, $reminderService) {
   $scope.form = {
-    email: null
+    email: null,
+    frequency: Frequency.WEEKLY
   };
   $scope.Frequency = Frequency;
+  $scope.submitting = false;
+  $scope.success = false;
+  $scope.error = false;
+
+  $scope.formValid = function() {
+    return $scope.form.email && $scope.form.email.indexOf('@') != -1;
+  };
+
+  $scope.submit = function() {
+    $scope.error = false;
+    $scope.success = false;
+    $scope.submitting = true;
+    $reminderService.create($scope.form.email, $scope.form.frequency)
+      .then(function(response) {
+        $scope.submitting = false;
+        $scope.success = true;
+      }, function(response) {
+        $scope.submitting = false;
+        $scope.error = true;
+      });
+  };
 }
 
 function ComposeCtrl($scope, $repService, $routeParams, $preloadData, $document) {
@@ -289,6 +311,16 @@ function RepService($http) {
   };
 }
 
+function ReminderService($http) {
+  this.create = function(email, frequency) {
+    var req = {
+      'email': email,
+      'frequency': frequency
+    };
+    return $http.post('/reminder_service/create', req);
+  };
+}
+
 function PageTransitioner($document, $location, $preloadData) {
   this.goToComposePage = function(repId) {
     $preloadData.clear();
@@ -334,6 +366,7 @@ function initMain(clientConfig) {
     .controller('ReminderCtrl', ReminderCtrl)
     .controller('ComposeCtrl', ComposeCtrl)
     .service('$repService', RepService)
+    .service('$reminderService', ReminderService)
     .service('$pageTransitioner', PageTransitioner)
     .directive('repCard', repCard)
     .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)
