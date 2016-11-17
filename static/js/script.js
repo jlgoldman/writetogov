@@ -151,7 +151,10 @@ function ReminderCtrl($scope, $reminderService) {
 }
 
 function ComposeCtrl($scope, $repService, $routeParams, $preloadData, $document) {
-  $scope.state = {loading: false};
+  $scope.state = {
+    loading: false,
+    composeComplete: false
+  };
   $scope.form = {
     repId: $routeParams.repId,
     body: null,

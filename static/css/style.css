@@ -108,7 +108,7 @@ a.search-toggle-link:hover {
   text-align: center;
 }
 
-.container .center-text {
+.container .centered-block {
   font-size: 18px;
   max-width: 600px;
   margin: auto;
@@ -129,7 +129,7 @@ a.search-toggle-link:hover {
 md-input-container.hide-error-msg .md-errors-spacer:empty {
   display: none;
 }
-.reminder-form .hack-email-alignment {
+.index-reminder-container .reminder-form .hack-email-alignment {
   position: relative;
   top: 3px;
 }
@@ -149,7 +149,7 @@ md-input-container.hide-error-msg .md-errors-spacer:empty {
   color: rgba(0,0,0,0.87)
 }
 
-.index-reminder-container .reminder-form-panel .submit-button {
+.reminder-form .submit-button {
   text-align: center;
 }
 
@@ -232,6 +232,19 @@ h3.tips-title {
 .compose-button-panel {
   margin-top: 20px;
   text-align: center;
+}
+
+.after-compose-panel {
+  max-width: 500px;
+  margin: 20px auto 0 auto;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.compose-reminder-panel {
+  margin-top: 10px;
 }
 
 .footer-toolbar {

@@ -89,7 +89,7 @@
       </md-progress-circular>
     </div>
     <div class="container index-desc-container">
-      <div class="center-text">
+      <div class="centered-block">
         <p>
           Change is more likely to come for groups that are vocal. Our representatives
           are tasked with listening to us and acting on our behalf but due to busyness,
@@ -104,7 +104,7 @@
     </div>
     <div class="container index-how-it-works-container">
       <div class="headline">How it Works</div>
-      <div class="center-text">
+      <div class="centered-block">
         <p>
           Start by looking up who represents you. Enter your address to see the House
           representative from your district and your two senators, as well as the
@@ -123,7 +123,7 @@
         </p>
       </div>
     </div>
-    <div class="container index-reminder-container" ng-controller="ReminderCtrl">
+    <div class="container index-reminder-container">
       <div class="headline">
         Maximize your impact by contacting your representatives regularly
       </div>
@@ -131,43 +131,48 @@
         <p>
           Sign up to get a periodic reminder to write another letter:
         </p>
-        <div class="md-inline-form reminder-form" layout="column">
-          <div layout="row" flex layout-align="center start">
-            <md-input-container flex="70" flex-xs="60"
-              class="md-block hide-error-msg hack-email-alignment">
-              <label>Email</label>
-              <input type="email" ng-model="form.email"/>
-            </md-input-container>
-            <md-input-container flex="30" flex-xs="40" class="md-block">
-              <label>Frequency</label>
-              <md-select ng-model="form.frequency">
-                <md-option value="[[Frequency.WEEKLY]]">
-                  Weekly
-                </md-option>
-                <md-option value="[[Frequency.MONTHLY]]">
-                  Monthly
-                </md-option>
-              </md-select>
-            </md-input-container>
-          </div>
-          <div class="submit-button">
-            <md-button class="md-primary md-raised" ng-click="submit()"
-              ng-disabled="!formValid() || submitting || success">
-              Submit
-            </md-button>
-          </div>
-          <md-progress-circular md-mode="indeterminate" ng-show="submitting" class="center-progress">
-          </md-progress-circular>
-          <div ng-if="success" md-colors="{color:'primary'}">
-            Thank you for signing up for reminders! You'll receive an email each
-            [[form.frequency == Frequency.WEEKLY ? 'week' : 'month']]
-            with a link to return and write another letter. You may opt out any time.
-          </div>
-          <div ng-if="error" md-colors="{color:'warn'}">
-            There was an error subscribing you for reminders. Please try again.
-          </div>
+        <div ng-include="'reminder-form-template'">
         </div>
       </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="reminder-form-template">
+  <div class="md-inline-form reminder-form" layout="column" ng-controller="ReminderCtrl">
+    <div layout="row" flex layout-align="center start">
+      <md-input-container flex="70" flex-xs="60"
+        class="md-block hide-error-msg hack-email-alignment">
+        <label>Email</label>
+        <input type="email" ng-model="form.email"/>
+      </md-input-container>
+      <md-input-container flex="30" flex-xs="40" class="md-block">
+        <label>Frequency</label>
+        <md-select ng-model="form.frequency">
+          <md-option value="[[Frequency.WEEKLY]]">
+            Weekly
+          </md-option>
+          <md-option value="[[Frequency.MONTHLY]]">
+            Monthly
+          </md-option>
+        </md-select>
+      </md-input-container>
+    </div>
+    <div class="submit-button">
+      <md-button class="md-primary md-raised" ng-click="submit()"
+        ng-disabled="!formValid() || submitting || success">
+        Submit
+      </md-button>
+    </div>
+    <md-progress-circular md-mode="indeterminate" ng-show="submitting" class="center-progress">
+    </md-progress-circular>
+    <div ng-if="success" md-colors="{color:'primary'}">
+      Thank you for signing up for reminders! You'll receive an email each
+      [[form.frequency == Frequency.WEEKLY ? 'week' : 'month']]
+      with a link to return and write another letter. You may opt out any time.
+    </div>
+    <div ng-if="error" md-colors="{color:'warn'}">
+      There was an error subscribing you for reminders. Please try again.
     </div>
   </div>
 </script>
@@ -242,6 +247,7 @@
               <textarea ng-model="form.body" style="display:none" name="body"></textarea>
               <textarea ng-model="form.nameAndAddress" style="display:none" name="name_and_address"></textarea>
               <md-button class="md-raised md-primary" type="submit"
+                ng-click="state.composeComplete = true"
                 ng-disabled="!isFormComplete()">
                 Generate PDF to Print
               </md-button>
@@ -249,6 +255,30 @@
             <md-button class="md-raised" ng-disabled="!isFormComplete()">
               Have Us Print and Mail
             </md-button>
+          </div>
+          <div class="after-compose-panel" ng-if="state.composeComplete">
+            <p md-colors="{color:'primary'}" class="center-text">
+              Thank you for being an involved citizen!
+            </p>
+            <p>
+              The PDF of your letter includes an optional address page that is
+              pre-filled with the mailing address of your representative as well
+              as your return address if you provided one above, so that you
+              don't have to use and prepare an envelope.
+              Print your letter (double-sided if your printer supports it),
+              then simply put the address page on the outside, fold it up in thirds, staple the top, add a stamp, and you're good to go!
+            </p>
+
+            <div class="compose-reminder-panel">
+              <div md-colors="{color:'primary'}" class="center-text">
+                Maximize your impact by staying involved
+              </div>
+              <div class="center-text">
+                Sign up to be reminded to send another letter again in the future:
+              </div>
+              <div ng-include="'reminder-form-template'">
+              </div>
+            </div>
           </div>
         </div>
         <div flex-gt-sm="40" flex="100" flex-order-gt-sm="2" flex-order="1" flex-offset-gt-sm="5">
