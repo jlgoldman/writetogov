@@ -133,11 +133,12 @@
         </p>
         <div class="md-inline-form reminder-form" layout="column">
           <div layout="row" flex layout-align="center start">
-            <md-input-container flex="70" class="md-block hide-error-msg hack-email-alignment">
+            <md-input-container flex="70" flex-xs="60"
+              class="md-block hide-error-msg hack-email-alignment">
               <label>Email</label>
-              <input type="text" ng-model="form.email"/>
+              <input type="email" ng-model="form.email"/>
             </md-input-container>
-            <md-input-container flex="30" class="md-block">
+            <md-input-container flex="30" flex-xs="40" class="md-block">
               <label>Frequency</label>
               <md-select ng-model="form.frequency">
                 <md-option value="[[Frequency.WEEKLY]]">
