@@ -50,7 +50,8 @@ def generate_letter():
         app.logger.error('Error generating PDF letter: %s', resp)
         response_code = 400 if resp.response_code == apilib.ResponseCode.REQUEST_ERROR else 500
         return 'There was an error generating your letter', response_code
-    return flask.Response(resp.pdf_content, mimetype='application/pdf')
+    return flask.Response(resp.pdf_content, mimetype='application/pdf',
+        headers={'Content-Disposition': 'attachment; filename=letter.pdf'})
 
 if constants.DEBUG:
     # For debugging only
