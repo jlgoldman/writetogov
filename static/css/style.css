@@ -44,11 +44,14 @@ a.header-link:hover {
 .index-search-container .tagline-1 {
   text-align: center;
   font-size: 24px;
+  line-height: 30px;
 }
 
 .index-search-container .tagline-2 {
+  margin-top: 10px;
   text-align: center;
   font-size: 36px;
+  line-height: 36px;
 }
 
 .search-panel {
