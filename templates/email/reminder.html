@@ -1,0 +1,21 @@
+{% extends 'email/base_message.html' %}
+
+{% block message %}
+  <div>
+    It's been a {% if frequency == 'w' %}week{% else %}month{% endif %}
+    since you last wrote a letter to one of your elected representatives.
+  </div>
+  <div>
+    Visit <a href="https://www.writetogov.com">www.writetogov.com</a> to
+    write another letter. It only takes a few minutes.
+  </div>
+  <div style="text-align: center">
+    <a href="https://www.writetogov.com">Write a Letter</a>
+  </div>
+  <div style="text-align: center; color: #777777">
+    You received this message because you subscribed to
+    {% if frequency == 'w' %}weekly{% else %}monthly{% endif %}
+    reminders at writetogov.com. To opt out, click
+    <a href="{{unsubscribe_url}}">here</a>.
+  </div>
+{% endblock %}
