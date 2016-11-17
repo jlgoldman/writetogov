@@ -23,7 +23,8 @@ var Frequency = {
   MONTHLY: 'MONTHLY'
 };
 
-function IndexCtrl($scope, $repService, $location, $repResults, $repAutocompleteData) {
+function IndexCtrl($scope, $repService, $location,
+    $pageTransitioner, $repResults, $repAutocompleteData, $document) {
   $scope.form = {
     address: null,
 
@@ -45,7 +46,7 @@ function IndexCtrl($scope, $repService, $location, $repResults, $repAutocomplete
       .then(function(response) {
         $scope.state.loading = false;
         $repResults.updateFromLookupResponse(response.data);
-        $location.path('/district/' + response.data['house_rep']['district_code']);
+        $pageTransitioner.goToDistrictPage(response.data['house_rep']['district_code']);
       });
   };
 
@@ -56,8 +57,14 @@ function IndexCtrl($scope, $repService, $location, $repResults, $repAutocomplete
 
   $scope.$watch('form.selectedSearchItem', function(item, oldItem) {
     if (item !== oldItem) {
-      $location.path('/compose/' + item.repId);
+      $pageTransitioner.goToComposePage(item.repId);
     };
+  });
+
+  $scope.$watch(function() {return $location.path();}, function(path, oldPath) {
+    if (path == '/') {
+      $document[0].title = 'Write to the Government - Write Your Elected Representatives';
+    }
   });
 
   $scope.textSearch = function(query) {
@@ -96,41 +103,22 @@ function IndexCtrl($scope, $repService, $location, $repResults, $repAutocomplete
   };
 }
 
-function DistrictCtrl($scope, $repResults, $repService, $routeParams) {
+function DistrictCtrl($scope, $repResults, $repService, $preloadData, $routeParams, $document) {
+  if ($preloadData.lookupResp && $preloadData.lookupResp['house_rep']) {
+    $repResults.updateFromLookupResponse($preloadData.lookupResp);
+  }
   $scope.repResults = $repResults;
   $scope.state = {
     loading: false
   };
 
-  this.init = function() {
-    if (!$repResults.houseRep) {
-      $scope.state.loading = true;
-      $repResults.clear();
-      $repService.lookupByDistrictCode($routeParams.districtCode)
-        .then(function(response) {
-          $scope.state.loading = false;
-          $repResults.updateFromLookupResponse(response.data);
-        });
-    };
-  };
-
-  this.init();
-}
-
-function RepPageCtrl($scope, $repService, $routeParams) {
-  $scope.state = {loading: false};
-  $scope.rep = null;
-
-  this.init = function() {
-    $scope.state.loading = true;
-    $repService.getByRepId($routeParams.repId)
-      .then(function(response) {
-        $scope.state.loading = false;
-        $scope.rep = response.data['reps'][0]
-      });
-  };
-
-  this.init();
+  if ($repResults.houseRep) {
+    var template = _.template('<%= stateName %>\'s <%= ordinal %> District - Write to the Government');
+    $document[0].title = template({
+      stateName: $repResults.houseRep['state_name'],
+      ordinal: $repResults.houseRep['district_ordinal']
+    });
+  }
 }
 
 function ReminderCtrl($scope) {
@@ -140,7 +128,7 @@ function ReminderCtrl($scope) {
   $scope.Frequency = Frequency;
 }
 
-function ComposeCtrl($scope, $repService, $routeParams) {
+function ComposeCtrl($scope, $repService, $routeParams, $preloadData, $document) {
   $scope.state = {loading: false};
   $scope.form = {
     repId: $routeParams.repId,
@@ -148,14 +136,26 @@ function ComposeCtrl($scope, $repService, $routeParams) {
     nameAndAddress: null
   };
   $scope.currentDate = new Date();
-  $scope.rep = null;
+  $scope.rep = $preloadData.rep || null;
 
   this.init = function() {
+    if ($scope.rep) {
+      return;
+    }
     $scope.state.loading = true;
     $repService.getByRepId($routeParams.repId)
       .then(function(response) {
         $scope.state.loading = false;
-        $scope.rep = response.data['reps'][0]
+        $scope.rep = response.data['reps'][0];
+
+        if ($scope.rep) {
+          var template = _.template('Write to <%= title %> <%= first %> <%= last %> - Write to the Government');
+          $document[0].title = template({
+            title: $scope.rep['title'],
+            first: $scope.rep['first_name'],
+            last: $scope.rep['last_name']
+          });
+        }
       });
   };
 
@@ -202,6 +202,16 @@ function RepResults(houseRep, senators, houseSpeaker, senateMajorityLeader) {
     this.houseSpeaker = null;
     this.senateMajorityLeader = null;
   };
+}
+
+function PreloadData(rep, lookupResp) {
+  this.rep = rep;
+  this.lookupResp = lookupResp;
+
+  this.clear = function() {
+    this.rep = null;
+    this.lookupResp = null;
+  }
 }
 
 function repCard() {
@@ -279,13 +289,22 @@ function RepService($http) {
   };
 }
 
+function PageTransitioner($document, $location, $preloadData) {
+  this.goToComposePage = function(repId) {
+    $preloadData.clear();
+    $location.path('/compose/' + repId);
+  };
+
+  this.goToDistrictPage = function(districtCode) {
+    $preloadData.clear();
+    $location.path('/district/' + districtCode);
+  };
+}
+
 function routeConfig($routeProvider, $locationProvider) {
   $routeProvider
     .when('/district/:districtCode', {
       templateUrl: 'district-template'
-    })
-    .when('/state/:stateCode', {
-      templateUrl: 'state-template'
     })
     .when('/compose/:repId', {
       templateUrl: 'compose-template'
@@ -312,14 +331,15 @@ function initMain(clientConfig) {
   angular.module('mainApp', ['ngMaterial', 'ngRoute'], BRACKET_INTERPOLATOR)
     .controller('IndexCtrl', IndexCtrl)
     .controller('DistrictCtrl', DistrictCtrl)
-    .controller('RepPageCtrl', RepPageCtrl)
     .controller('ReminderCtrl', ReminderCtrl)
     .controller('ComposeCtrl', ComposeCtrl)
     .service('$repService', RepService)
+    .service('$pageTransitioner', PageTransitioner)
     .directive('repCard', repCard)
     .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)
     .value('$repResults', new RepResults())
     .value('$repAutocompleteData', clientConfig['rep_autocomplete_data'])
+    .value('$preloadData', new PreloadData(clientConfig['rep'], clientConfig['lookup_response']))
     .config(routeConfig)
     .config(themeConfig)
     .config(function($mdGestureProvider) {

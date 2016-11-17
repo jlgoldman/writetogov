@@ -158,6 +158,11 @@ h2.leadership-header {
   padding-top: 30px;
 }
 
+h1.invalid-district {
+  text-align: center;
+  font-weight: 400;
+}
+
 .rep-card {
   max-width: 400px;
 }

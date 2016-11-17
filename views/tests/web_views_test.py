@@ -12,8 +12,6 @@ class WebViewsTest(test_base.RealDatabaseTest):
         self.assertEqual(200, resp.status_code)
         resp = self.client.get('/district/CA11')
         self.assertEqual(200, resp.status_code)
-        resp = self.client.get('/state/FL')
-        self.assertEqual(200, resp.status_code)
         resp = self.client.get('/compose/20')
         self.assertEqual(200, resp.status_code)
 

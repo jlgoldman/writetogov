@@ -2,7 +2,9 @@
 
 {% block ng_app %}mainApp{% endblock %}
 
-{% block title %}WriteToGov - Write Your Elected Representatives{% endblock %}
+{% block title -%}
+{% if title %}{{title}}{% else %}Write to the Government - Write Your Elected Representatives{% endif %}
+{% endblock %}
 
 {% block content %}
 <ng-include src="'navbar-template'"></ng-include>
@@ -161,11 +163,16 @@
     <md-progress-circular md-mode="indeterminate" ng-show="state.loading" class="center-progress">
     </md-progress-circular>
     <div ng-if="!state.loading">
-      <h1 class="district-header">Your Representatives</h1>
-      <div layout="row" layout-wrap layout-align="center none">
-        <rep-card rep="repResults.houseRep"></rep-card>
-        <rep-card ng-repeat="rep in repResults.senators" rep="rep"></rep-card>
+      <div ng-if="repResults.houseRep">
+        <h1 class="district-header">Your Representatives</h1>
+        <div layout="row" layout-wrap layout-align="center none">
+          <rep-card rep="repResults.houseRep"></rep-card>
+          <rep-card ng-repeat="rep in repResults.senators" rep="rep"></rep-card>
+        </div>
       </div>
+      <h1 ng-if="!repResults.houseRep" class="invalid-district" md-colors="{color:'warn'}">
+        Oops, it doesn't look like this is a valid congressional district.
+      </h1>
       <h2 class="leadership-header">
         Consider also writing to congressional leadership:
       </h2>
@@ -176,18 +183,6 @@
         <rep-card ng-if="repResults.senateMajorityLeader" rep="repResults.senateMajorityLeader"
           extra-title="Senate Majority Leader">
         </rep-card>
-      </div>
-    </div>
-  </div>
-</script>
-
-<script type="text/ng-template" id="rep-page-template">
-  <div class="container district-container" ng-controller="RepPageCtrl">
-    <md-progress-circular md-mode="indeterminate" ng-show="state.loading" class="center-progress">
-    </md-progress-circular>
-    <div ng-if="!state.loading">
-      <div layout="row" layout-wrap layout-align="center none">
-        <rep-card rep="rep"></rep-card>
       </div>
     </div>
   </div>
