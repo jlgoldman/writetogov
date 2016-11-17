@@ -18,6 +18,19 @@ html, body {
   vertical-align: middle;
 }
 
+.header-toolbar .social-widgets {
+  text-align: right;
+}
+
+.header-toolbar .social-widgets .fb-like,
+.header-toolbar .social-widgets .twitter-button {
+  display: inline-block;
+}
+
+.header-toolbar .social-widgets .twitter-button #twitter-widget-0 {
+  vertical-align: bottom;
+}
+
 a.header-link,
 a.header-link:active,
 a.header-link:visited,

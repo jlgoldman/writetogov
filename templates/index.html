@@ -16,11 +16,24 @@
 <script type="text/ng-template" id="navbar-template">
   <md-toolbar class="header-toolbar">
     <div layout="row" flex>
-      <div flex="70">
+      <div flex="50">
         <a href="/" class="header-link">
           <img src="/static/img/logo-white.svg" class="header-logo"/>
-          Write to the Government
+          <span hide-xs>
+            Write to the Government
+          </span>
+          <span hide-gt-xs>
+            Write to the Gov.
+          </span>
         </a>
+      </div>
+      <div flex="50" class="social-widgets">
+        <div class="fb-like" data-href="https://www.writetogov.com" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="true"></div>
+        <div class="twitter-button">
+          <a class="twitter-share-button"
+          href="https://twitter.com/intent/tweet?text=Write%20a%20letter%20to%20your%20elected%20representatives%3A&url=https%3A//www.writetogov.com">
+          </a>
+        </div>
       </div>
     </div>
   </md-toolbar>
@@ -360,4 +373,31 @@
 <script>
   initMain({{client_config | tojson}});
 </script>
+
+{# Social widgets #}
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.8&appId=1632711647048612";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<script>window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));</script>
 {% endblock %}
