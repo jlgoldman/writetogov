@@ -18,7 +18,7 @@ class WebViewsTest(test_base.RealDatabaseTest):
         self.assertEqual(200, resp.status_code)
 
     def test_generate_letter_pdf(self):
-        resp = self.client.post('/generate_letter', data=dict(
+        resp = self.client.post('/letter', data=dict(
             rep_id='61',
             body='hello world',
             name_and_address='Bob Smith\nSan Francisco, CA'))
@@ -28,7 +28,7 @@ class WebViewsTest(test_base.RealDatabaseTest):
 
     @mock.patch('app.app.logger.error')
     def test_generate_letter_with_invalid_params(self, mock_log_error):
-        resp = self.client.post('/generate_letter', data=dict(
+        resp = self.client.post('/letter', data=dict(
             rep_id='-1',
             body='hello world',
             name_and_address='Bob Smith\nSan Francisco, CA'))
