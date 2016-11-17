@@ -84,3 +84,19 @@ class Rep(db.Model):
         if self.chamber == self.Chamber.HOUSE:
             return text.ordinal(self.district_number) if self.district_number > 0 else 'At-Large'
         return None
+
+class Reminder(db.Model):
+    class Frequency(object):
+        WEEKLY = 'w'
+        MONTHLY = 'm'
+    class Status(object):
+        ACTIVE = 'a'
+        UNSUBSCRIBED = 'u'
+
+    reminder_id = db.Column(db.BigInteger, primary_key=True)
+    email = db.Column(db.String(100), index=True)
+    frequency = db.Column(db.String(1), index=True)
+    status = db.Column(db.String(1), index=True)
+    last_contacted = db.Column(db.DateTime(timezone=True), index=True)
+    time_created = db.Column(db.DateTime(timezone=True))
+    time_updated = db.Column(db.DateTime(timezone=True))
