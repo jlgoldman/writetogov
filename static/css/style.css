@@ -35,6 +35,12 @@ a.header-link:hover {
   margin: auto;
 }
 
+.index-search-container {
+  background: url('/static/img/capitol-bg.jpg');
+  background-size: cover;
+  background-position: 50% 50%;
+}
+
 .index-search-container .tagline-1 {
   text-align: center;
   font-size: 24px;
