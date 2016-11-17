@@ -159,7 +159,11 @@ h2.leadership-header {
 }
 
 .rep-card {
-  width: 400px;
+  max-width: 400px;
+}
+
+.rep-card .rep-photo-wrapper {
+  text-align: right;
 }
 
 .rep-card .rep-photo {
