@@ -20,6 +20,8 @@ PDF_FONT_FILE = os.path.join(PROJECTPATH, 'data/fonts/cmunrm.ttf')
 REP_AUTOCOMPLETE_DATA_FNAME = os.path.join(PROJECTPATH, 'data/rep_autocomplete.20161115.json')
 PROPUBLICA_API_KEY = None
 
+INTERNAL_IPS = ()
+
 try:
     from constants_override import *
 except ImportError:

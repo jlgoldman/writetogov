@@ -1,3 +1,5 @@
+import functools
+
 import apilib
 import flask
 from flask import json
@@ -61,6 +63,24 @@ def reminder_unsubscribe():
     has_invalid_token = update_response.errors and update_response.errors[0].code == 'INVALID_TOKEN'
     return render_template('reminder_unsubscribe.html',
         success=success, has_invalid_token=has_invalid_token)
+
+# Internal monitoring servlets
+
+def internal_monitoring_only(fn):
+    @functools.wraps(fn)
+    def decorated(*args, **kwargs):
+        if ('ELB-HealthChecker' in request.user_agent.string) or is_internal():
+            return fn(*args, **kwargs)
+        return '', 404
+    return decorated
+
+@app.route('/healthz')
+@internal_monitoring_only
+def healthz():
+    return 'ok'
+
+def is_internal():
+    return request.remote_addr in constants.INTERNAL_IPS
 
 if constants.DEBUG:
     # For debugging only
