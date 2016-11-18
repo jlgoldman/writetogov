@@ -24,6 +24,7 @@ GOOGLE_MAPS_API_KEY = None
 SENGRID_API_KEY = None
 
 INTERNAL_IPS = ()
+MONITORING_NOTIFICATION_EMAILS = ()
 
 try:
     from constants_override import *

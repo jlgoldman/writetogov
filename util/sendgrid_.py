@@ -1,3 +1,4 @@
+import logging.handlers
 import pprint
 
 import sendgrid
@@ -15,6 +16,11 @@ def send_message(subject, body_text, body_html, recipients,
     personalizations = [
         {'to': [{'email': email} for email in recipients]}
     ]
+    content = []
+    if body_text:
+        content.append({'type': 'text/plain', 'value': body_text})
+    if body_html:
+        content.append({'type': 'text/html',  'value': body_html})
     if ccs:
         personalizations.append({'cc': [{'email': email} for email in ccs]})
     if bccs:
@@ -22,13 +28,17 @@ def send_message(subject, body_text, body_html, recipients,
     data = {
         'subject': subject,
         'from': {'email': sender_email, 'name': sender_name},
-        'content': [
-            {'type': 'text/plain', 'value': body_text},
-            {'type': 'text/html',  'value': body_html},
-        ],
+        'content': content,
         'personalizations': personalizations,
         }
     if print_data:
         pprint.pprint(data)
     if send:
         return sg_client.client.mail.send.post(request_body=data)
+
+class SendgridEmailLogHandler(logging.handlers.SMTPHandler):
+    def emit(self, record):
+        try:
+            send_message(self.subject, body_text=self.format(record), body_html=None, recipients=list(self.toaddrs))
+        except:
+            self.handleError(record)
