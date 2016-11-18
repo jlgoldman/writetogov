@@ -189,6 +189,18 @@ h1.invalid-district {
   max-width: 400px;
 }
 
+@media (max-width: 600px) {
+  .rep-card {
+    width: 350px;
+  }
+}
+
+@media (min-width: 601px) {
+  .rep-card {
+    width: 400px;
+  }
+}
+
 .rep-card .rep-photo-wrapper {
   text-align: right;
 }
