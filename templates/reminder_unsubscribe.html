@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Unsubscribe from Reminders - Write to the Government{% endblock %}
+
+{% block extra_styles %}
+  <style>
+    .simple-navbar {
+      width: 100%;
+      height: 40px;
+      padding: 10px;
+      background-color: #607D8B;
+      color: #fff;
+    }
+    .simple-navbar .navbar-text {
+      font-size: 20px;
+    }
+    .main-content {
+      padding: 30px;
+    }
+  </style>
+{% endblock %}
+
+
+{% block content %}
+  <div class="simple-navbar">
+    <img src="/static/img/logo-white.svg" class="header-logo"/>
+    <span class="navbar-text">
+      Write to the Government
+    </span>
+  </div>
+
+  <div class="main-content">
+    {% if success %}
+      You've been successfully unsubscribed from reminders.
+      <br/><br/>
+      You can resubscribe at any time at <a href="https://www.writetogov.com">www.writetogov.com</a>
+    {% elif has_invalid_token %}
+      Your unsubscribe link has expired or is invalid.
+    {% else %}
+      There was an error unsubscribing you. Please contact <a href="mailto:info@writetogov.com">info@writetogov.com</a>.
+    {% endif %}
+  </div>
+{% endblock %}
