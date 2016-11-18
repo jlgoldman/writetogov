@@ -6,6 +6,7 @@ from flask import render_template
 from database import db
 from database import db_models
 from logic import reminder_service
+from util import sendgrid_
 from util import time_
 from util import urls
 
@@ -35,22 +36,21 @@ def send_reminder_email(email, frequency):
     token = reminder_service.generate_email_token(email)
     unsubscribe_url = urls.absurl(urls.append_params('/reminder/unsubscribe', dict(
         email=email, token=token)))
+    subject = 'It\'s time to write to your elected representatives'
+
     html = render_template('email/reminder.html',
+        subject=subject,
         frequency=frequency,
         unsubscribe_url=unsubscribe_url)
     text = render_template('email/reminder.txt',
         frequency=frequency,
         unsubscribe_url=unsubscribe_url)
-    subject = 'It\'s time to write to your elected representatives'
-    send_message(
+
+    sendgrid_.send_message(
         subject=subject,
         body_text=text,
         body_html=html,
         recipients=[email])
-
-# Placeholder until email is set up.
-def send_message(**kwargs):
-    pass
 
 if __name__ == '__main__':
     from tools import db_utils

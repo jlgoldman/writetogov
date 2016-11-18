@@ -29,7 +29,7 @@ def create_db_reminder(email, last_contacted=None,
 def date_days_ago(days):
     return time_.utcnow() - relativedelta.relativedelta(days=days)
 
-@mock.patch('jobs.reminder_cron.send_message')
+@mock.patch('util.sendgrid_.send_message')
 class ReminderCronTest(test_base.FakeDatabaseTest):
     def test_reminders_sent(self, mock_send_message):
         create_db_reminder('weekly@weekly.com',

@@ -17,16 +17,26 @@
     .main-content {
       padding: 30px;
     }
+    .simple-navbar a,
+    .simple-navbar a:active,
+    .simple-navbar a:visited,
+    .simple-navbar a:hover {
+      text-decoration: none;
+      color: #fff;
+      outline: 0;
+    }
   </style>
 {% endblock %}
 
 
 {% block content %}
   <div class="simple-navbar">
-    <img src="/static/img/logo-white.svg" class="header-logo"/>
-    <span class="navbar-text">
-      Write to the Government
-    </span>
+    <a href="/">
+      <img src="/static/img/logo-white.svg" class="header-logo"/>
+      <span class="navbar-text">
+        Write to the Government
+      </span>
+    </a>
   </div>
 
   <div class="main-content">

@@ -1,26 +1,54 @@
-<table cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#ebeef0">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block subject %}{% endblock %}</title>
+  <style>
+    .cta-button {
+      background-color: #607D8B;
+      color: #ffffff;
+      display: inline-block;
+      cursor: pointer;
+      min-height: 36px;
+      min-width: 88px;
+      line-height: 36px;
+      vertical-align: middle;
+      text-align: center;
+      border-radius: 3px;
+      box-sizing: border-box;
+      border: 0;
+      padding: 0 6px;
+      margin: 6px 8px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<table cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#FAFAFA">
   <tr>
     <td>
-      <table cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#212529">
+      <table cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#607D8B">
         <center>
-          <table cellspacing="0" cellpadding="0" border="0" width="182px">
+          <table cellspacing="0" cellpadding="0" border="0" width="252px">
             <tr>
-              <td height="40px" width="100%" style="border-collapse: collapse">
+              <td height="10px" width="100%" style="border-collapse: collapse">
               </td>
             </tr>
-            <tr height="40px">
+            <tr height="50px">
               <td style="border-collapse: collapse">
-                <img src="https://www.writetogov.com/static/img/logo-white.svg"/>
+                <img src="https://www.writetogov.com/static/img/email-text-logo.svg"/>
               </td>
             </tr>
             <tr>
-              <td height="40px" width="100%" style="border-collapse: collapse">
+              <td height="10px" width="100%" style="border-collapse: collapse">
               </td>
             </tr>
           </table>
         </center>
       </table>
-      <table height="80px" width="100%" bgcolor="#ebeef0">
+      <table height="30px" width="100%" bgcolor="#FAFAFA">
       </table>
       <center>
         <table cellspacing="0" cellpadding="0" border="0" width="600px">
@@ -41,7 +69,7 @@
               <table>
                 <tr>
                   <td>
-                    The team at writetogov.com
+                    {% block signature %}{% endblock %}
                   </td>
                 </tr>
               </table>
@@ -60,7 +88,7 @@
         </table>
         <table cellspacing="0" cellpadding="0" border="0" width="600px">
           <tr>
-            <td bgcolor="#ebeef0" height="80px" width="600px" style="border-collapse: collapse">
+            <td bgcolor="#FAFAFA" height="30px" width="600px" style="border-collapse: collapse">
             </td>
           </tr>
         </table>
@@ -68,3 +96,6 @@
     </td>
   </tr>
 </table>
+
+</body>
+</html>
