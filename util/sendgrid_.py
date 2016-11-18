@@ -31,11 +31,4 @@ def send_message(subject, body_text, body_html, recipients,
     if print_data:
         pprint.pprint(data)
     if send:
-        try:
-            return sg_client.client.mail.send.post(request_body=data)
-        except Exception as e:
-            print e.headers
-            print e.info
-            print e.message
-            print e.read()
-            raise
+        return sg_client.client.mail.send.post(request_body=data)
