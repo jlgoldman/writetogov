@@ -33,6 +33,7 @@ def index(district_code=None, rep_id=None):
 
     return render_template('index.html',
         title=title,
+        google_maps_api_key=constants.GOOGLE_MAPS_API_KEY,
         client_config=dict(
             rep=api_rep.to_json() if api_rep else None,
             lookup_response=lookup_resp.to_json() if lookup_resp else None,
