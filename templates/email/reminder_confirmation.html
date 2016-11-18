@@ -1,0 +1,37 @@
+{% extends 'email/base_message.html' %}
+
+{% block subject %}{{subject}}{% endblock %}
+
+{% block message %}
+  <table>
+    <tr>
+      <td>
+        This is a confirmation that you signed up to receive
+        {% if frequency == 'w' %}weekly{% else %}monthly{% endif %}
+        reminders to write to your elected representatives
+        at <a href="https://www.writetogov.com">www.writetogov.com</a>.
+      </td>
+    </tr>
+  </table>
+  <table height="20px">
+  </table>
+
+  <table>
+    <tr>
+      <td>
+        If this is correct, there's nothing you need to do.
+      </td>
+    </tr>
+  </table>
+  <table height="20px">
+  </table>
+
+  <table>
+    <tr>
+      <td>
+        If you did not request this or you no longer want reminders, simply click
+        <a href="{{unsubscribe_url}}">here</a> to opt out.
+      </td>
+    </tr>
+  </table>
+{% endblock %}

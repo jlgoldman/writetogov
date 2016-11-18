@@ -5,7 +5,7 @@ from flask import render_template
 
 from database import db
 from database import db_models
-from logic import reminder_service
+from logic import reminder_logic
 from util import sendgrid_
 from util import time_
 from util import urls
@@ -33,9 +33,7 @@ def main():
             print 'Error sending reminder email: %s' % e
 
 def send_reminder_email(email, frequency):
-    token = reminder_service.generate_email_token(email)
-    unsubscribe_url = urls.absurl(urls.append_params('/reminder/unsubscribe', dict(
-        email=email, token=token)))
+    unsubscribe_url = reminder_logic.generate_unsubscribe_url(email)
     subject = 'It\'s time to write to your elected representatives'
 
     html = render_template('email/reminder.html',

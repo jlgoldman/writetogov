@@ -1,11 +1,11 @@
-import calendar
-
 import apilib
+from flask import render_template
 
 from api import reminder
 from database import db
 from database import db_models
-from util import crypto
+from logic import reminder_logic
+from util import sendgrid_
 from util import time_
 
 R = db_models.Reminder
@@ -20,8 +20,6 @@ API_STATUS_TO_DB = {
     reminder.Status.UNSUBSCRIBED: R.Status.UNSUBSCRIBED,
 }
 
-TOKEN_EXPIRY_SECS = 60 * 60 * 24 * 7  # 1 week
-
 class ReminderServiceImpl(reminder.ReminderService, apilib.ServiceImplementation):
     def __init__(self, **kwargs):
         pass
@@ -30,26 +28,27 @@ class ReminderServiceImpl(reminder.ReminderService, apilib.ServiceImplementation
         email = req.email.strip().lower()
         now = time_.utcnow()
         existing_db_reminder = R.query.filter(R.email == email).first()
+        db_frequency = API_FREQUENCY_TO_DB[req.frequency]
         if existing_db_reminder:
-            existing_db_reminder.frequency = API_FREQUENCY_TO_DB[req.frequency]
+            existing_db_reminder.frequency = db_frequency
             existing_db_reminder.status = R.Status.ACTIVE
             existing_db_reminder.last_contacted = now
             existing_db_reminder.time_updated = now
         else:
             db_reminder = db_models.Reminder(
                 email=email,
-                frequency=API_FREQUENCY_TO_DB[req.frequency],
+                frequency=db_frequency,
                 status=R.Status.ACTIVE,
                 last_contacted=now,
                 time_created=now,
                 time_updated=now)
             db.session.add(db_reminder)
         db.session.commit()
-        # TODO: Send confirmation email
+        _send_confirmation_email(email, db_frequency)
         return reminder.CreateReminderResponse()
 
     def update(self, req):
-        if not verify_email_token(req.token, req.email):
+        if not reminder_logic.verify_email_token(req.token, req.email):
             raise _invalid_token_exception()
         email = req.email.strip().lower()
         now = time_.utcnow()
@@ -64,25 +63,23 @@ class ReminderServiceImpl(reminder.ReminderService, apilib.ServiceImplementation
         # For debugging
         return True
 
-def generate_email_token(email):
-    email = email.strip().lower()
-    timestamp = _current_timestamp()
-    msg = '%s|||%d' % (email, timestamp)
-    return crypto.encrypt_with_salt(msg)
+def _send_confirmation_email(email, frequency):
+    unsubscribe_url = reminder_logic.generate_unsubscribe_url(email)
+    subject = 'Confirmation of periodic reminders'
 
-def verify_email_token(token, email):
-    email = email.strip().lower()
-    try:
-        msg = crypto.decrypt_with_salt(token)
-    except:
-        return False
-    parts = msg.split('|||')
-    token_email, token_timestamp = parts[0], int(parts[1])
-    return (token_email == email
-        and _current_timestamp() - token_timestamp < TOKEN_EXPIRY_SECS)
+    html = render_template('email/reminder_confirmation.html',
+        subject=subject,
+        frequency=frequency,
+        unsubscribe_url=unsubscribe_url)
+    text = render_template('email/reminder_confirmation.txt',
+        frequency=frequency,
+        unsubscribe_url=unsubscribe_url)
 
-def _current_timestamp():
-    return calendar.timegm(time_.utcnow().timetuple())
+    sendgrid_.send_message(
+        subject=subject,
+        body_text=text,
+        body_html=html,
+        recipients=[email])
 
 def _invalid_token_exception():
     error = apilib.ApiError(code='INVALID_TOKEN', path='token',

@@ -1,0 +1,7 @@
+This is a confirmation that you signed up to receive {% if frequency == 'w' %}weekly{% else %}monthly{% endif %} reminders to write to your elected representatives
+at https://www.writetogov.com.
+
+If this is correct, there's nothing you need to do.
+
+If you did not request this or you no longer want reminders, simply click here to opt out:
+{{unsubscribe_url}}
