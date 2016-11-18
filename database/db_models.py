@@ -75,7 +75,6 @@ class Rep(db.Model):
     bioguide_id = db.Column(db.String(10))
     status = db.Column(db.String(1), index=True)
     status_note = db.Column(db.String(100))
-    photo_url = db.Column(db.String(255))
 
     def state_name(self):
         return fips.get_state_name_for_code(self.state_code)
