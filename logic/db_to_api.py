@@ -36,6 +36,10 @@ def db_rep_to_api(db_rep):
         db_rep.address_dc[:wash_dc_idx - 1],
         db_rep.address_dc[wash_dc_idx:],
     ]
+    photo_url = None
+    if db_rep.first_name:
+        # We've grabbed images for all non-vacant reps
+        photo_url = 'https://writetogov.s3.amazonaws.com/images/rep/%d.jpg' % db_rep.rep_id
     return rep.Rep(
         rep_id=db_rep.rep_id,
         first_name=db_rep.first_name,
@@ -57,7 +61,7 @@ def db_rep_to_api(db_rep):
         phone_dc=db_rep.phone_dc,
         status=DB_STATUS_TO_API.get(db_rep.status),
         status_note=db_rep.status_note,
-        photo_url=db_rep.photo_url)
+        photo_url=photo_url)
 
 def db_reps_to_api(db_reps):
     if not db_reps:

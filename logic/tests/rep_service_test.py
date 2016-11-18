@@ -27,7 +27,7 @@ class RepServiceTest(test_base.RealDatabaseTest):
         self.assertEqual(['231 Longworth House Office Building', 'Washington DC, 20515'],
             resp.house_rep.address_dc_lines)
         self.assertEqual(rep.Rep.Status.ACTIVE, resp.house_rep.status)
-        self.assertEqual('http://bioguide.congress.gov/bioguide/photo/T/T000460.jpg', resp.house_rep.photo_url)
+        self.assertEqual('https://writetogov.s3.amazonaws.com/images/rep/127.jpg', resp.house_rep.photo_url)
 
         senators = sorted(resp.senators, key=lambda s: s.last_name)
         self.assertEqual('Boxer', senators[0].last_name)
