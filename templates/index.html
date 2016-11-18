@@ -233,7 +233,7 @@
       </h1>
       <div layout-gt-sm="row" layout="column" flex layout-align="center start">
         <div flex-gt-sm="60" flex="100" class="compose-column" flex-order-gt-sm="1" flex-order="2">
-          <div class="compose-wrapper">
+          <div class="compose-wrapper" ng-show="!state.composeComplete">
             <div class="compose-header">
               <div class="compose-header-section">
                 [[currentDate | date: 'longDate']]
@@ -257,7 +257,7 @@
               <textarea ng-model="form.nameAndAddress" rows="5"></textarea>
             </md-input-container>
           </div>
-          <div class="compose-button-panel">
+          <div class="compose-button-panel" ng-show="!state.composeComplete">
             <form action="/letter" method="POST" target="_blank" class="generate-form">
               <input type="text" ng-model="form.repId" style="display:none" name="rep_id"/>
               <textarea ng-model="form.body" style="display:none" name="body"></textarea>
@@ -273,6 +273,13 @@
             </md-button>
           </div>
           <div class="after-compose-panel" ng-if="state.composeComplete">
+            <div class="return-to-letter">
+              <a href="javascript:void(0)" ng-click="state.composeComplete = false">
+                <i class="material-icons">keyboard_arrow_down</i>
+                Return to letter
+              </a>
+            </div>
+
             <p md-colors="{color:'primary'}" class="center-text">
               Thank you for being an involved citizen!
             </p>
