@@ -2,6 +2,7 @@ import unittest
 
 import mock
 
+from logic import reminder_service
 from testing import test_base
 from views import web_views
 assert web_views  # Silence pyflakes
@@ -32,6 +33,16 @@ class WebViewsTest(test_base.RealDatabaseTest):
             name_and_address='Bob Smith\nSan Francisco, CA'))
         self.assertEqual(400, resp.status_code)
         mock_log_error.assert_called_once()
+
+    @mock.patch.object(reminder_service.ReminderServiceImpl, 'update')
+    def test_reminder_unsubscribe(self, mock_update):
+        resp = self.client.get('/reminder/unsubscribe?email=foo@foo.com&token=blah')
+        self.assertEqual(200, resp.status_code)
+        mock_update.assert_called_once()
+        update_req = mock_update.call_args[0][0]
+        self.assertEqual('foo@foo.com', update_req.email)
+        self.assertEqual('blah', update_req.token)
+        self.assertEqual('UNSUBSCRIBED', update_req.status)
 
 if __name__ == '__main__':
     unittest.main()

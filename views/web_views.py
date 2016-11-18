@@ -53,6 +53,15 @@ def generate_letter():
     return flask.Response(resp.pdf_content, mimetype='application/pdf',
         headers={'Content-Disposition': 'attachment; filename=letter.pdf'})
 
+@app.route('/reminder/unsubscribe')
+def reminder_unsubscribe():
+    update_response = api_shortcuts.unsubscribe_from_reminder(
+        request.args['email'], request.args['token'])
+    success = update_response.response_code == 'SUCCESS'
+    has_invalid_token = update_response.errors and update_response.errors[0].code == 'INVALID_TOKEN'
+    return render_template('reminder_unsubscribe.html',
+        success=success, has_invalid_token=has_invalid_token)
+
 if constants.DEBUG:
     # For debugging only
     @app.route('/letter_debug', methods=['POST'])
