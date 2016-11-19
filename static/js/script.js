@@ -108,9 +108,6 @@ function DistrictCtrl($scope, $repResults, $repService, $preloadData, $routePara
     $repResults.updateFromLookupResponse($preloadData.lookupResp);
   }
   $scope.repResults = $repResults;
-  $scope.state = {
-    loading: false
-  };
 
   if ($repResults.houseRep) {
     var template = _.template('<%= stateName %>\'s <%= ordinal %> District - Write to the Government');
@@ -119,6 +116,10 @@ function DistrictCtrl($scope, $repResults, $repService, $preloadData, $routePara
       ordinal: $repResults.houseRep['district_ordinal']
     });
   }
+
+  // HACK: After doing an address search, make sure we're back to the
+  // top of the page.
+  $document[0].body.scrollTop = 0;
 }
 
 function ReminderCtrl($scope, $reminderService) {
