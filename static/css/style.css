@@ -104,6 +104,18 @@ a.header-link:hover {
   height: 40px;
 }
 
+/* Fixes for Safari rendering stupid giant cursors */
+.address-input {
+  line-height: unset;
+}
+md-autocomplete input:not(.md-input) {
+  line-height: 14px;
+}
+md-input-container input[type=text].md-input,
+md-input-container input[type=email].md-input {
+  line-height: unset;
+}
+
 .search-toggle {
   margin-top: 30px;
 }
