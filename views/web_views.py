@@ -65,6 +65,19 @@ def reminder_unsubscribe():
     return render_template('reminder_unsubscribe.html',
         success=success, has_invalid_token=has_invalid_token)
 
+@app.route('/robots.txt')
+def robots_txt():
+    return text_data_file_response('robots.txt')
+
+@app.route('/sitemap.txt')
+def sitemap_txt():
+    return text_data_file_response('sitemap.txt')
+
+def text_data_file_response(filename):
+    text = open(constants.abspath('data/%s' % filename)).read()
+    return flask.Response(text, mimetype='text/plain')
+
+
 # Internal monitoring servlets
 
 def internal_monitoring_only(fn):

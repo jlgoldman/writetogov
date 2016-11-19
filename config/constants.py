@@ -26,6 +26,9 @@ SENGRID_API_KEY = None
 INTERNAL_IPS = ()
 MONITORING_NOTIFICATION_EMAILS = ()
 
+def abspath(*path_elements):
+    return os.path.join(PROJECTPATH, *path_elements)
+
 try:
     from constants_override import *
 except ImportError:
