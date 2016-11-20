@@ -109,8 +109,7 @@ def is_internal():
 @app.context_processor
 def inject_extended_template_builtins():
     return dict(
-        canonical_url=urls.absurl(request.url))
-
+        canonical_url=urls.absurl(request.path))
 
 if constants.DEBUG:
     # For debugging only
