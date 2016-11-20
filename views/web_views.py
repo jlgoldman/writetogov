@@ -11,28 +11,38 @@ from app import app
 from config import constants
 from logic import api_shortcuts
 from logic import letter_service
+from util import urls
 
 AUTOCOMPLETE_DATA = json.load(open(constants.REP_AUTOCOMPLETE_DATA_FNAME))
+
+class PageType(object):
+    HOME = 1
+    DISTRICT = 2
+    COMPOSE = 3
 
 @app.route('/')
 @app.route('/district/<district_code>')
 @app.route('/compose/<int:rep_id>')
 def index(district_code=None, rep_id=None):
-    api_rep, lookup_resp, title = None, None, None
+    page_type = PageType.HOME
+    if request.path.startswith('/district/'):
+        page_type = PageType.DISTRICT
+    elif request.path.startswith('/compose/'):
+        page_type = PageType.COMPOSE
+
+    api_rep, lookup_resp = None, None
     if district_code:
         lookup_resp = api_shortcuts.lookup_reps_by_district_code(district_code)
-        if lookup_resp and lookup_resp.house_rep:
-            title = '%s\'s %s District - Write to the Government' % (
-                lookup_resp.house_rep.state_name, lookup_resp.house_rep.district_ordinal)
     elif rep_id:
         api_rep = api_shortcuts.get_rep_by_id(rep_id)
         if not api_rep:
             return 'Invalid representative id', 404
-        title = 'Write to %s %s %s - Write to the Government' % (
-            api_rep.title, api_rep.first_name, api_rep.last_name)
 
     return render_template('index.html',
-        title=title,
+        page_type=page_type,
+        PageType=PageType,
+        rep=api_rep,
+        lookup_response=lookup_resp,
         google_maps_api_key=constants.GOOGLE_MAPS_API_KEY,
         client_config=dict(
             rep=api_rep.to_json() if api_rep else None,
@@ -95,6 +105,12 @@ def healthz():
 
 def is_internal():
     return request.remote_addr in constants.INTERNAL_IPS
+
+@app.context_processor
+def inject_extended_template_builtins():
+    return dict(
+        canonical_url=urls.absurl(request.url))
+
 
 if constants.DEBUG:
     # For debugging only

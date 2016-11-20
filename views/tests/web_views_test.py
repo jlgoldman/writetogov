@@ -16,6 +16,11 @@ class WebViewsTest(test_base.RealDatabaseTest):
         resp = self.client.get('/compose/20')
         self.assertEqual(200, resp.status_code)
 
+        resp = self.client.get('/robots.txt')
+        self.assertEqual(200, resp.status_code)
+        resp = self.client.get('/sitemap.txt')
+        self.assertEqual(200, resp.status_code)
+
     def test_generate_letter_pdf(self):
         resp = self.client.post('/letter', data=dict(
             rep_id='61',

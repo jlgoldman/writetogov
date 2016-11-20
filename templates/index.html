@@ -2,9 +2,34 @@
 
 {% block ng_app %}mainApp{% endblock %}
 
+{% set common_description = 'writetogov.com makes it fast and simple to write and mail a letter to your elected representatives.' %}
+
+{% if page_type == PageType.DISTRICT and lookup_response and lookup_response.house_rep %}
+  {% set og_title = "%s\'s %s District" | format(lookup_response.house_rep.state_name, lookup_response.house_rep.district_ordinal) %}
+  {% set title = '%s - Write to the Government' | format(og_title) %}
+  {% set description = "Write a letter to the representatives of %s\'s %s district. %s" | format(lookup_response.house_rep.state_name, lookup_response.house_rep.district_ordinal, common_description) %}
+  {% set og_image = None %}
+{% elif page_type == PageType.COMPOSE and rep %}
+  {% set og_title = 'Write to %s %s %s' | format(rep.title, rep.first_name, rep.last_name) %}
+  {% set title = '%s - Write to the Government' | format(og_title) %}
+  {% set description = 'Write to %s %s %s of %s. %s' | format(rep.title, rep.first_name, rep.last_name, rep.state_name, common_description) %}
+  {% set og_image = rep.photo_url %}
+{% else %}
+  {% set title = 'Write to the Government - Write Your Elected Representatives' %}
+  {% set og_title = title %}
+  {% set description = 'Find your elected representatives and let them know what you think about issues by sending them a physical letter.' %}
+  {% set og_image = None %}
+{% endif %}
+
 {% block title -%}
 {% if title %}{{title}}{% else %}Write to the Government - Write Your Elected Representatives{% endif %}
 {%- endblock %}
+
+{% block extra_meta_tags %}
+  <meta property="og:title"       content="{{og_title}}"/>
+  <meta property="og:description" content="{{description}}"/>
+  <meta property="og:image"       content="{{og_image or 'https://www.writetogov.com/static/img/og-image.jpg'}}"/>
+{% endblock %}
 
 {% block content %}
 <ng-include src="'navbar-template'"></ng-include>
