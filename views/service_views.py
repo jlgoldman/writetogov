@@ -3,6 +3,7 @@ from flask import json
 from flask import request
 
 from app import app
+from logic import letter_service
 from logic import reminder_service
 from logic import rep_service
 
@@ -19,6 +20,10 @@ def invoke_service(service_class, method_name, **kwargs):
     elif response['response_code'] == apilib.ResponseCode.REQUEST_ERROR:
         response_code = 400
     return json.jsonify(response), response_code
+
+@serviceroute(letter_service.LetterServiceImpl)
+def letter_service_(method_name):
+    return invoke_service(letter_service.LetterServiceImpl, method_name)
 
 @serviceroute(reminder_service.ReminderServiceImpl)
 def reminder_service_(method_name):

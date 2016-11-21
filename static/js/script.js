@@ -154,6 +154,7 @@ function ReminderCtrl($scope, $reminderService) {
 function ComposeCtrl($scope, $repService, $routeParams, $preloadData, $document) {
   $scope.state = {
     loading: false,
+    mailFormOpen: false,
     composeComplete: false
   };
   $scope.form = {
@@ -190,7 +191,66 @@ function ComposeCtrl($scope, $repService, $routeParams, $preloadData, $document)
       && $scope.form.nameAndAddress && $scope.form.nameAndAddress.trim();
   };
 
+  $scope.openMailForm = function() {
+    $scope.state.mailFormOpen = true;
+    // HACK: Make sure we scroll to the top of the page so the form is properly visble;
+    $document[0].body.scrollTop = 0;
+  };
+
   this.init();
+}
+
+function RepStripeFormCtrl($scope, $StripeCheckout, $stripePublishableKey, $letterService) {
+  $scope.submitting = false;
+  $scope.errors = [];
+
+  var stripeHandler = $StripeCheckout.configure({
+    key: $stripePublishableKey,
+    image: 'https://www.writetogov.com/static/img/logo-bluegrey-1024.png',
+    locale: 'auto',
+    token: function(tokenData) {
+      $scope.$apply(function() {
+        $scope.submitting = true;
+        $scope.errors = [];
+        $letterService.generateAndMail(tokenData['id'], $scope.rep['rep_id'], $scope.body, $scope.nameAndAddress)
+          .then(function(response) {
+            $scope.submitting = false;
+          }, function(response) {
+            $scope.submitting = false;
+            console.log(response);
+            $scope.errors = response.data['errors'];
+          })
+      });
+    }
+  });
+
+  $scope.openStripeCheckout = function() {
+    var descTemplate =  _.template('Mail a letter to <%= title %> <%= first %> <%= last %>');
+    var description = descTemplate({
+      title: $scope.rep['title'],
+      first: $scope.rep['first_name'],
+      last: $scope.rep['last_name']
+    });
+    stripeHandler.open({
+      name: 'Write to the Government',
+      description: description,
+      amount: 150,
+      allowRememberMe: false
+    });
+  };
+}
+
+function repStripeForm() {
+  return {
+    scope: {
+      rep: '=',
+      body: '=',
+      nameAndAddress: '=',
+      buttonText: '@',
+    },
+    templateUrl: 'rep-stripe-form-template',
+    controller: RepStripeFormCtrl
+  };
 }
 
 function RepResults(houseRep, senators, houseSpeaker, senateMajorityLeader) {
@@ -325,6 +385,18 @@ function ReminderService($http) {
   };
 }
 
+function LetterService($http) {
+  this.generateAndMail = function(stripeToken, repId, body, nameAndAddress) {
+    var req = {
+      'stripe_token': stripeToken,
+      'rep_id': repId,
+      'body': body,
+      'name_and_address': nameAndAddress
+    };
+    return $http.post('/letter_service/generate_and_mail', req);
+  };
+}
+
 function PageTransitioner($document, $location, $preloadData) {
   this.goToComposePage = function(repId) {
     $preloadData.clear();
@@ -371,12 +443,16 @@ function initMain(clientConfig) {
     .controller('ComposeCtrl', ComposeCtrl)
     .service('$repService', RepService)
     .service('$reminderService', ReminderService)
+    .service('$letterService', LetterService)
     .service('$pageTransitioner', PageTransitioner)
     .directive('repCard', repCard)
     .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)
+    .directive('repStripeForm', repStripeForm)
     .value('$repResults', new RepResults())
     .value('$repAutocompleteData', clientConfig['rep_autocomplete_data'])
     .value('$preloadData', new PreloadData(clientConfig['rep'], clientConfig['lookup_response']))
+    .value('$StripeCheckout', window['StripeCheckout'])
+    .value('$stripePublishableKey', clientConfig['stripe_publishable_key'])
     .config(routeConfig)
     .config(themeConfig)
     .config(function($mdGestureProvider) {

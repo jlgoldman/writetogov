@@ -6,6 +6,7 @@ import apilib
 from dateutil import tz
 import flask
 from PyPDF2 import PdfFileMerger
+import stripe
 from xhtml2pdf import pisa
 
 from api import letter
@@ -13,6 +14,8 @@ from app import app
 from config import constants
 from database import db_models
 from logic import db_to_api
+
+stripe.api_key = constants.STRIPE_SECRET_KEY
 
 R = db_models.Rep
 
@@ -47,6 +50,20 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         return letter.GenerateLetterResponse(
             pdf_content=pdf_buffer.getvalue())
 
+    def generate_and_mail(self, req):
+        db_rep = R.query.get(req.rep_id)
+        html = self._generate_html(req, db_rep)
+        pdf_buffer = _create_pdf(html)
+
+        api_rep = db_to_api.db_rep_to_api(db_rep)
+        charge_desc = 'Mail a letter to %s %s %s' % (
+            api_rep.title, api_rep.first_name, api_rep.last_name)
+        self._charge_via_stripe(req.stripe_token, charge_desc)
+
+        self._make_lob_request(pdf_buffer)
+
+        return letter.GenerateAndMailLetterResponse()
+
     def _generate_html(self, req, db_rep=None):
         db_rep = db_rep or R.query.get(req.rep_id)
         if not db_rep:
@@ -67,6 +84,20 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
             sender_address=_make_sender_address(req.name_and_address),
             pdf_font_file=constants.PDF_FONT_FILE)
 
+    def _charge_via_stripe(self, stripe_token, description):
+        try:
+            stripe.Charge.create(
+                amount=150,
+                currency='usd',
+                source=stripe_token,
+                description=description)
+        except stripe.error.CardError as e:
+            app.logger.error('Stripe charge error: %s', e)
+            raise _charge_error_exception('There was an error charging your card: %s' % e.message)
+
+    def _make_lob_request(self, pdf_buffer):
+        pass
+
     def process_unhandled_exception(self, exception):
         # For debugging
         return True
@@ -82,6 +113,11 @@ def merge_pdf_buffers(*buffers):
 def _invalid_rep_id_exception(rep_id):
     error = apilib.ApiError(code='UNKNOWN_REP', path='rep_id',
         message='No representative with rep_id %s could be found.' % rep_id)
+    return apilib.ApiException.request_error([error])
+
+def _charge_error_exception(message):
+    error = apilib.ApiError(code='CHARGE_ERROR', path='stripe_token',
+        message=message)
     return apilib.ApiException.request_error([error])
 
 def _create_pdf(pdf_data):

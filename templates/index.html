@@ -264,7 +264,7 @@
       </h1>
       <div layout-gt-sm="row" layout="column" flex layout-align="center start">
         <div flex-gt-sm="60" flex="auto" class="compose-column" flex-order-gt-sm="1" flex-order="2">
-          <div class="compose-wrapper" ng-show="!state.composeComplete">
+          <div class="compose-wrapper" ng-show="!state.composeComplete && !state.mailFormOpen">
             <div class="compose-header">
               <div class="compose-header-section">
                 [[currentDate | date: 'longDate']]
@@ -288,7 +288,7 @@
               <textarea ng-model="form.nameAndAddress" rows="5"></textarea>
             </md-input-container>
           </div>
-          <div class="compose-button-panel" ng-show="!state.composeComplete">
+          <div class="compose-button-panel" ng-show="!state.composeComplete && !state.mailFormOpen">
             <form action="/letter" method="POST" target="_blank" class="generate-form">
               <input type="text" ng-model="form.repId" style="display:none" name="rep_id"/>
               <textarea ng-model="form.body" style="display:none" name="body"></textarea>
@@ -299,10 +299,40 @@
                 Generate PDF to Print
               </md-button>
             </form>
-            <md-button class="md-raised" ng-disabled="!isFormComplete()">
+            <md-button class="md-raised" ng-disabled="!isFormComplete()" ng-click="openMailForm()">
               Have Us Print and Mail
             </md-button>
           </div>
+
+          <div class="mail-form-panel" ng-if="state.mailFormOpen">
+            <div class="return-to-letter">
+              <a href="javascript:void(0)" ng-click="state.mailFormOpen = false">
+                <i class="material-icons">keyboard_arrow_down</i>
+                Return to letter
+              </a>
+            </div>
+
+            <p>
+              We can have your letter printed and mailed on your behalf.
+              This uses the letter-mailing service lob.com, incurring
+              a small fee simply to cover costs.
+            </p>
+            <p>
+              First, <a href="javascript:void(0)">preview your letter</a> to
+              make sure it looks as you intend.
+            </p>
+            <p>
+              Then simply enter billing information and confirm:
+            </p>
+            <rep-stripe-form rep="rep" body="form.body" name-and-address="form.nameAndAddress"
+              button-text="Enter Billing Info">
+            </rep-stripe-form>
+            <p class="fees">
+              Our letter-mailing service lob.com charges $0.95 per letter + $0.10 per extra page. Our payment processor Stripe charges $0.30 + 2.9% per transaction. The extra ~$0.20 is used to cover the cost of operating our servers.
+              We will work to negotiate lower mailing and transaction fees over time.
+            </p>
+          </div>
+
           <div class="after-compose-panel" ng-if="state.composeComplete">
             <div class="return-to-letter">
               <a href="javascript:void(0)" ng-click="state.composeComplete = false">
@@ -406,7 +436,25 @@
   </md-card>
 </script>
 
+<script type="text/ng-template" id="rep-stripe-form-template">
+  <div class="rep-stripe-form">
+    <div ng-if="!submitting">
+      <md-button class="md-primary md-raised" ng-click="openStripeCheckout()">
+        [[buttonText]]
+      </md-button>
+    </div>
+    <md-progress-circular md-mode="indeterminate" ng-show="submitting" class="center-progress">
+    </md-progress-circular>
+    <div ng-if="errors && errors.length">
+      <p ng-repeat="error in errors" md-colors="{color:'warn'}">
+        [[error['message'] ]]
+      </p>
+    </div>
+  </div>
+</script>
+
 <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key={{google_maps_api_key}}"></script>
+<script src="https://checkout.stripe.com/checkout.js"></script>
 
 <script>
   initMain({{client_config | tojson}});

@@ -48,6 +48,7 @@ def index(district_code=None, rep_id=None):
             rep=api_rep.to_json() if api_rep else None,
             lookup_response=lookup_resp.to_json() if lookup_resp else None,
             rep_autocomplete_data=AUTOCOMPLETE_DATA,
+            stripe_publishable_key=constants.STRIPE_PUBLISHABLE_KEY,
         ))
 
 @app.route('/letter', methods=['POST'])

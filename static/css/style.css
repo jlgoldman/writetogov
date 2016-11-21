@@ -274,29 +274,44 @@ h3.tips-title {
   text-align: center;
 }
 
+.compose-container .mail-form-panel {
+  max-width: 500px;
+  margin: auto;
+}
+
+.compose-container .mail-form-panel .rep-stripe-form {
+  text-align: center;
+}
+
+.compose-container .mail-form-panel .fees {
+  margin-top: 20px;
+  font-size: 11px;
+  color: #777;
+}
+
 .after-compose-panel {
   max-width: 500px;
   margin: 20px auto 0 auto;
 }
 
-.after-compose-panel .return-to-letter {
+.compose-container .return-to-letter {
   text-align: center;
 }
 
-.after-compose-panel .return-to-letter i.material-icons {
+.compose-container .return-to-letter i.material-icons {
   vertical-align: middle;
 }
 
-.after-compose-panel .return-to-letter a,
-.after-compose-panel .return-to-letter a.visited,
-.after-compose-panel .return-to-letter a:hover,
-.after-compose-panel .return-to-letter a:active {
+.compose-container .return-to-letter a,
+.compose-container .return-to-letter a.visited,
+.compose-container .return-to-letter a:hover,
+.compose-container .return-to-letter a:active {
   color: #777;
   text-decoration: none;
   outline: 0;
 }
 
-.after-compose-panel .return-to-letter a:hover {
+.compose-container .return-to-letter a:hover {
   color: #191716;
 }
 
