@@ -293,6 +293,7 @@
               <input type="text" ng-model="form.repId" style="display:none" name="rep_id"/>
               <textarea ng-model="form.body" style="display:none" name="body"></textarea>
               <textarea ng-model="form.nameAndAddress" style="display:none" name="name_and_address"></textarea>
+              <input type="text" style="display:none" name="include_address_page" value="1"/>
               <md-button class="md-raised md-primary" type="submit"
                 ng-click="state.composeComplete = true"
                 ng-disabled="!isFormComplete()">
@@ -317,10 +318,19 @@
               This uses the letter-mailing service lob.com, incurring
               a small fee simply to cover costs.
             </p>
-            <p>
-              First, <a href="javascript:void(0)">preview your letter</a> to
-              make sure it looks as you intend.
-            </p>
+            <div>
+              <form action="/letter" method="POST" target="_blank">
+                <input type="text" ng-model="rep['rep_id']" style="display:none" name="rep_id"/>
+                <textarea ng-model="body" style="display:none" name="body"></textarea>
+                <textarea ng-model="nameAndAddress" style="display:none" name="name_and_address"></textarea>
+                <input type="text" style="display:none" name="include_address_page" value="0"/>
+
+                First, preview your letter to make sure it looks as you intend:
+                <div class="preview-button">
+                  <md-button class="md-raised" type="submit">Preview</md-button>
+                </div>
+              </form>
+            </div>
             <p>
               Then simply enter billing information and confirm:
             </p>

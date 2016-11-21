@@ -57,7 +57,7 @@ def generate_letter():
         rep_id=int(request.form['rep_id']),
         body=request.form['body'],
         name_and_address=request.form['name_and_address'],
-        include_address_page=True)
+        include_address_page=request.form['include_address_page'] == '1')
     service = letter_service.LetterServiceImpl()
     resp = service.invoke('generate', req)
     if not resp.response_code == 'SUCCESS':

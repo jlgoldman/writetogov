@@ -1,7 +1,7 @@
 import unittest
 
-from PyPDF2 import PdfFileReader
 import mock
+from PyPDF2 import PdfFileReader
 import stripe
 
 from api import letter

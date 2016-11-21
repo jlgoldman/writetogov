@@ -1,6 +1,8 @@
+from cStringIO import StringIO
 import unittest
 
 import mock
+from PyPDF2 import PdfFileReader
 
 from logic import reminder_service
 from testing import test_base
@@ -25,17 +27,35 @@ class WebViewsTest(test_base.RealDatabaseTest):
         resp = self.client.post('/letter', data=dict(
             rep_id='61',
             body='hello world',
-            name_and_address='Bob Smith\nSan Francisco, CA'))
+            name_and_address='Bob Smith\nSan Francisco, CA',
+            include_address_page='1'))
         self.assertEqual(200, resp.status_code)
         self.assertEqual('application/pdf', resp.headers.get('Content-Type'))
         self.assertIsNotNone(resp.data)
+
+        pdf_reader = PdfFileReader(StringIO(resp.data))
+        self.assertEqual(2, pdf_reader.getNumPages())
+
+    def test_generate_letter_pdf_without_address_page(self):
+        resp = self.client.post('/letter', data=dict(
+            rep_id='61',
+            body='hello world',
+            name_and_address='Bob Smith\nSan Francisco, CA',
+            include_address_page='0'))
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual('application/pdf', resp.headers.get('Content-Type'))
+        self.assertIsNotNone(resp.data)
+
+        pdf_reader = PdfFileReader(StringIO(resp.data))
+        self.assertEqual(1, pdf_reader.getNumPages())
 
     @mock.patch('app.app.logger.error')
     def test_generate_letter_with_invalid_params(self, mock_log_error):
         resp = self.client.post('/letter', data=dict(
             rep_id='-1',
             body='hello world',
-            name_and_address='Bob Smith\nSan Francisco, CA'))
+            name_and_address='Bob Smith\nSan Francisco, CA',
+            include_address_page='1'))
         self.assertEqual(400, resp.status_code)
         mock_log_error.assert_called_once()
 

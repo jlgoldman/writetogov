@@ -279,6 +279,10 @@ h3.tips-title {
   margin: auto;
 }
 
+.compose-container .mail-form-panel .preview-button {
+  text-align: center;
+}
+
 .compose-container .mail-form-panel .rep-stripe-form {
   text-align: center;
 }
