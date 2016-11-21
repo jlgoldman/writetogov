@@ -6,16 +6,19 @@ from PyPDF2 import PdfFileReader
 
 from logic import reminder_service
 from testing import test_base
+from testing import test_data
 from views import web_views
 assert web_views  # Silence pyflakes
 
-class WebViewsTest(test_base.RealDatabaseTest):
+pelosi = test_data.RepData.nancy_pelosi
+
+class WebViewsTest(test_base.DatabaseWithTestdataTest):
     def test_heartbeat(self):
         resp = self.client.get('/')
         self.assertEqual(200, resp.status_code)
-        resp = self.client.get('/district/CA11')
+        resp = self.client.get('/district/%s' % test_data.DistrictData.wy00.district_code)
         self.assertEqual(200, resp.status_code)
-        resp = self.client.get('/compose/20')
+        resp = self.client.get('/compose/%s' % pelosi.rep_id)
         self.assertEqual(200, resp.status_code)
 
         resp = self.client.get('/robots.txt')
@@ -25,7 +28,7 @@ class WebViewsTest(test_base.RealDatabaseTest):
 
     def test_generate_letter_pdf(self):
         resp = self.client.post('/letter', data=dict(
-            rep_id='61',
+            rep_id=str(pelosi.rep_id),
             body='hello world',
             name_and_address='Bob Smith\nSan Francisco, CA',
             include_address_page='1'))
@@ -38,7 +41,7 @@ class WebViewsTest(test_base.RealDatabaseTest):
 
     def test_generate_letter_pdf_without_address_page(self):
         resp = self.client.post('/letter', data=dict(
-            rep_id='61',
+            rep_id=str(pelosi.rep_id),
             body='hello world',
             name_and_address='Bob Smith\nSan Francisco, CA',
             include_address_page='0'))

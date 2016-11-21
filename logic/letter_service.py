@@ -12,8 +12,10 @@ from xhtml2pdf import pisa
 from api import letter
 from app import app
 from config import constants
+from database import db
 from database import db_models
 from logic import db_to_api
+from util import time_
 
 stripe.api_key = constants.STRIPE_SECRET_KEY
 
@@ -58,7 +60,15 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         api_rep = db_to_api.db_rep_to_api(db_rep)
         charge_desc = 'Mail a letter to %s %s %s' % (
             api_rep.title, api_rep.first_name, api_rep.last_name)
-        self._charge_via_stripe(req.stripe_token, charge_desc)
+        stripe_charge = self._charge_via_stripe(req.stripe_token, charge_desc)
+        now = time_.utcnow()
+        db.session.add(db_models.RepMailing(
+            rep_id=req.rep_id,
+            email=req.email.strip().lower(),
+            stripe_charge_id=stripe_charge.id,
+            time_created=now,
+            time_updated=now))
+        db.session.commit()
 
         self._make_lob_request(pdf_buffer)
 
@@ -86,7 +96,7 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
 
     def _charge_via_stripe(self, stripe_token, description):
         try:
-            stripe.Charge.create(
+            return stripe.Charge.create(
                 amount=150,
                 currency='usd',
                 source=stripe_token,

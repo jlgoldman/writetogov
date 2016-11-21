@@ -11,6 +11,7 @@ class GenerateLetterResponse(apilib.Response):
 
 class GenerateAndMailLetterRequest(apilib.Request):
     stripe_token = apilib.Field(apilib.String(), required=True)
+    email = apilib.Field(apilib.String(), required=True)
     rep_id = apilib.Field(apilib.Integer(), required=True)
     body = apilib.Field(apilib.String(), required=True)
     name_and_address = apilib.Field(apilib.String(), required=True)

@@ -30,7 +30,7 @@ def date_days_ago(days):
     return time_.utcnow() - relativedelta.relativedelta(days=days)
 
 @mock.patch('util.sendgrid_.send_message')
-class ReminderCronTest(test_base.FakeDatabaseTest):
+class ReminderCronTest(test_base.DatabaseTest):
     def test_reminders_sent(self, mock_send_message):
         create_db_reminder('weekly@weekly.com',
             frequency=R.Frequency.WEEKLY,

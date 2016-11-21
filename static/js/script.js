@@ -212,7 +212,8 @@ function RepStripeFormCtrl($scope, $StripeCheckout, $stripePublishableKey, $lett
       $scope.$apply(function() {
         $scope.submitting = true;
         $scope.errors = [];
-        $letterService.generateAndMail(tokenData['id'], $scope.rep['rep_id'], $scope.body, $scope.nameAndAddress)
+        $letterService.generateAndMail(tokenData['id'], tokenData['email'],
+            $scope.rep['rep_id'], $scope.body, $scope.nameAndAddress)
           .then(function(response) {
             $scope.submitting = false;
           }, function(response) {
@@ -386,9 +387,10 @@ function ReminderService($http) {
 }
 
 function LetterService($http) {
-  this.generateAndMail = function(stripeToken, repId, body, nameAndAddress) {
+  this.generateAndMail = function(stripeToken, email, repId, body, nameAndAddress) {
     var req = {
       'stripe_token': stripeToken,
+      'email': email,
       'rep_id': repId,
       'body': body,
       'name_and_address': nameAndAddress

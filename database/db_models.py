@@ -99,3 +99,11 @@ class Reminder(db.Model):
     last_contacted = db.Column(db.DateTime(timezone=True), index=True)
     time_created = db.Column(db.DateTime(timezone=True))
     time_updated = db.Column(db.DateTime(timezone=True))
+
+class RepMailing(db.Model):
+    rep_mailing_id = db.Column(db.BigInteger, primary_key=True)
+    rep_id = db.Column(db.Integer, db.ForeignKey('rep.rep_id'), index=True)
+    email = db.Column(db.String(100), index=True)
+    stripe_charge_id = db.Column(db.String(50), index=True)
+    time_created = db.Column(db.DateTime(timezone=True))
+    time_updated = db.Column(db.DateTime(timezone=True))
