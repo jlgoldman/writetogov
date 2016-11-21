@@ -13,7 +13,7 @@
   {% set og_title = 'Write to %s %s %s' | format(rep.title, rep.first_name, rep.last_name) %}
   {% set title = '%s - Write to the Government' | format(og_title) %}
   {% set description = 'Write to %s %s %s of %s. %s' | format(rep.title, rep.first_name, rep.last_name, rep.state_name, common_description) %}
-  {% set og_image = rep.photo_url %}
+  {% set og_image = 'https://writetogov.s3.amazonaws.com/images/rep/%d-social.jpg' | format(rep.rep_id) %}
 {% else %}
   {% set title = 'Write to the Government - Write Your Elected Representatives' %}
   {% set og_title = title %}
