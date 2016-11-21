@@ -105,5 +105,6 @@ class RepMailing(db.Model):
     rep_id = db.Column(db.Integer, db.ForeignKey('rep.rep_id'), index=True)
     email = db.Column(db.String(100), index=True)
     stripe_charge_id = db.Column(db.String(50), index=True)
+    lob_letter_id = db.Column(db.String(50), index=True)
     time_created = db.Column(db.DateTime(timezone=True))
     time_updated = db.Column(db.DateTime(timezone=True))

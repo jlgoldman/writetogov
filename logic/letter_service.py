@@ -3,8 +3,10 @@ import datetime
 import re
 
 import apilib
+from dateutil import parser as dateutil_parser
 from dateutil import tz
 import flask
+import lob
 from PyPDF2 import PdfFileMerger
 import stripe
 from xhtml2pdf import pisa
@@ -18,6 +20,7 @@ from logic import db_to_api
 from util import time_
 
 stripe.api_key = constants.STRIPE_SECRET_KEY
+lob.api_key = constants.LOB_API_KEY
 
 R = db_models.Rep
 
@@ -58,21 +61,28 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         pdf_buffer = _create_pdf(html)
 
         api_rep = db_to_api.db_rep_to_api(db_rep)
-        charge_desc = 'Mail a letter to %s %s %s' % (
+        description = 'Letter to %s %s %s' % (
             api_rep.title, api_rep.first_name, api_rep.last_name)
-        stripe_charge = self._charge_via_stripe(req.stripe_token, charge_desc)
+        stripe_charge = self._charge_via_stripe(req.stripe_token, description)
         now = time_.utcnow()
-        db.session.add(db_models.RepMailing(
+        db_rep_mailing = db_models.RepMailing(
             rep_id=req.rep_id,
             email=req.email.strip().lower(),
             stripe_charge_id=stripe_charge.id,
             time_created=now,
-            time_updated=now))
+            time_updated=now)
+        db.session.add(db_rep_mailing)
         db.session.commit()
 
-        self._make_lob_request(pdf_buffer)
+        lob_response = self._make_lob_request(pdf_buffer, description)
+        db_rep_mailing.lob_letter_id = lob_response['id']
+        db_rep_mailing.time_updated = time_.utcnow()
+        db.session.commit()
 
-        return letter.GenerateAndMailLetterResponse()
+        return letter.GenerateAndMailLetterResponse(
+            expected_delivery_date=dateutil_parser.parse(
+                lob_response['expected_delivery_date']).strftime('%B %-d'),
+            lob_pdf_url=lob_response['url'])
 
     def _generate_html(self, req, db_rep=None):
         db_rep = db_rep or R.query.get(req.rep_id)
@@ -105,8 +115,34 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
             app.logger.error('Stripe charge error: %s', e)
             raise _charge_error_exception('There was an error charging your card: %s' % e.message)
 
-    def _make_lob_request(self, pdf_buffer):
-        pass
+    def _make_lob_request(self, pdf_buffer, description):
+        try:
+            return lob.Letter.create(
+              description=description,
+              to_address={
+                  'name': 'Harry Zhang',
+                  'address_line1': '123 Test Street',
+                  'address_city': 'Mountain View',
+                  'address_state': 'CA',
+                  'address_zip': '94041',
+                  'address_country': 'US'
+              },
+              from_address={
+                  'name': 'Harry Zhang',
+                  'address_line1': '123 Test Avenue',
+                  'address_city': 'Seattle',
+                  'address_state': 'WA',
+                  'address_zip': '94041',
+                  'address_country': 'US'
+              },
+              file=StringIO(pdf_buffer.getvalue()),
+              address_placement='insert_blank_page',
+              double_sided=True,
+              color=False)
+        except lob.error.LobError as e:
+            app.logger.error('Lob API error: %s', e)
+            raise _lob_error_exception(
+                'There was an error submitting your letter to be mailed. Please contact info@writetogov.com.')
 
     def process_unhandled_exception(self, exception):
         # For debugging
@@ -129,6 +165,10 @@ def _charge_error_exception(message):
     error = apilib.ApiError(code='CHARGE_ERROR', path='stripe_token',
         message=message)
     return apilib.ApiException.request_error([error])
+
+def _lob_error_exception(message):
+    error = apilib.ApiError(code='LETTER_ERROR', message=message)
+    return apilib.ApiException.server_error([error])
 
 def _create_pdf(pdf_data):
     if type(pdf_data) != unicode:

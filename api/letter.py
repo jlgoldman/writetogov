@@ -17,7 +17,8 @@ class GenerateAndMailLetterRequest(apilib.Request):
     name_and_address = apilib.Field(apilib.String(), required=True)
 
 class GenerateAndMailLetterResponse(apilib.Response):
-    pass
+    expected_delivery_date = apilib.Field(apilib.String())
+    lob_pdf_url = apilib.Field(apilib.String())
 
 class LetterService(apilib.Service):
     path = '/letter_service'

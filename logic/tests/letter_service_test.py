@@ -1,5 +1,7 @@
+import logging
 import unittest
 
+import lob
 import mock
 from PyPDF2 import PdfFileReader
 import stripe
@@ -12,6 +14,9 @@ from testing import test_data
 
 pelosi = test_data.RepData.nancy_pelosi
 RM = db_models.RepMailing
+
+# Silence logging that's not helpful for tests
+logging.getLogger('apilib.service').addHandler(logging.NullHandler())
 
 class LetterServiceTest(test_base.DatabaseWithTestdataTest):
     def service(self):
@@ -36,9 +41,9 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
         self.assertEqual('SUCCESS', resp.response_code)
         self.assertIsNotNone(resp.pdf_content)
 
-    @mock.patch.object(letter_service.LetterServiceImpl, '_make_lob_request')
+    @mock.patch.object(lob.Letter, 'create')
     @mock.patch.object(stripe.Charge, 'create')
-    def test_generate_and_mail_success(self, mock_charge_create, mock_make_lob_request):
+    def test_generate_and_mail_success(self, mock_charge_create, mock_letter_create):
         req = letter.GenerateAndMailLetterRequest(
             stripe_token='stripe-token',
             email='foo@foo.com',
@@ -46,29 +51,46 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
             body='hello world',
             name_and_address='Bob Smith\nSan Francisco, CA')
         mock_charge_create.return_value = stripe.Charge(id='stripe-charge-id')
-        mock_make_lob_request.return_value = None
+        mock_letter_create.return_value = {
+            'id': 'lob-letter-id',
+            'url': 'lob-url',
+            'expected_delivery_date': '2016-11-12',
+            }
         resp = self.service().invoke('generate_and_mail', req)
         self.assertEqual('SUCCESS', resp.response_code)
+        self.assertEqual('November 12', resp.expected_delivery_date)
+        self.assertEqual('lob-url', resp.lob_pdf_url)
 
         mock_charge_create.assert_called_once_with(
             amount=150,
             currency='usd',
             source='stripe-token',
-            description='Mail a letter to Representative Nancy Pelosi')
-        pdf_reader = PdfFileReader(mock_make_lob_request.call_args[0][0])
+            description='Letter to Representative Nancy Pelosi')
+
+        mock_letter_create.assert_called_once()
+        letter_kwargs = mock_letter_create.call_args[1]
+        self.assertEqual('Letter to Representative Nancy Pelosi', letter_kwargs['description'])
+        self.assertTrue(letter_kwargs['double_sided'])
+        self.assertFalse(letter_kwargs['color'])
+        self.assertEqual('insert_blank_page', letter_kwargs['address_placement'])
+        pdf_reader = PdfFileReader(letter_kwargs['file'])
         self.assertEqual(1, pdf_reader.getNumPages())
+        self.assertIsNotNone(letter_kwargs['to_address'])
+        self.assertIsNotNone(letter_kwargs['from_address'])
 
         db_rm = RM.query.filter(RM.email == req.email).first()
         self.assertIsNotNone(db_rm)
         self.assertEqual('stripe-charge-id', db_rm.stripe_charge_id)
         self.assertEqual(req.rep_id, db_rm.rep_id)
+        self.assertEqual('lob-letter-id', db_rm.lob_letter_id)
         self.assertIsNotNone(db_rm.time_created)
         self.assertIsNotNone(db_rm.time_updated)
+        self.assertGreater(db_rm.time_updated, db_rm.time_created)
 
     @mock.patch('app.app.logger.error')
-    @mock.patch.object(letter_service.LetterServiceImpl, '_make_lob_request')
+    @mock.patch.object(lob.Letter, 'create')
     @mock.patch.object(stripe.Charge, 'create')
-    def test_generate_and_mail_with_stripe_error(self, mock_charge_create, mock_make_lob_request, mock_log_error):
+    def test_generate_and_mail_with_stripe_error(self, mock_charge_create, mock_letter_create, mock_log_error):
         req = letter.GenerateAndMailLetterRequest(
             stripe_token='stripe-token',
             email='foo@foo.com',
@@ -77,7 +99,7 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
             name_and_address='Bob Smith\nSan Francisco, CA')
         mock_charge_create.side_effect = stripe.error.CardError(
             message='error message', param=None, code=None)
-        mock_make_lob_request.return_value = None
+        mock_letter_create.return_value = None
         resp = self.service().invoke('generate_and_mail', req)
         self.assertEqual('REQUEST_ERROR', resp.response_code)
         self.assertEqual(1, len(resp.errors))
@@ -87,13 +109,44 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
             amount=150,
             currency='usd',
             source='stripe-token',
-            description='Mail a letter to Representative Nancy Pelosi')
-        mock_make_lob_request.assert_not_called()
+            description='Letter to Representative Nancy Pelosi')
+        mock_letter_create.assert_not_called()
         mock_log_error.assert_called_once()
 
         db_rm = RM.query.filter(RM.email == req.email).first()
         self.assertIsNone(db_rm)
 
+    @mock.patch('app.app.logger.error')
+    @mock.patch.object(lob.Letter, 'create')
+    @mock.patch.object(stripe.Charge, 'create')
+    def test_generate_and_mail_with_lob_error(self, mock_charge_create, mock_letter_create, mock_log_error):
+        req = letter.GenerateAndMailLetterRequest(
+            stripe_token='stripe-token',
+            email='foo@foo.com',
+            rep_id=pelosi.rep_id,
+            body='hello world',
+            name_and_address='Bob Smith\nSan Francisco, CA')
+        mock_charge_create.return_value = stripe.Charge(id='stripe-charge-id')
+        mock_letter_create.side_effect = lob.error.LobError('test error')
+        resp = self.service().invoke('generate_and_mail', req)
+        self.assertEqual('SERVER_ERROR', resp.response_code)
+        self.assertEqual(1, len(resp.errors))
+        self.assertEqual(
+            'There was an error submitting your letter to be mailed. Please contact info@writetogov.com.',
+            resp.errors[0].message)
+
+        mock_charge_create.assert_called_once()
+        mock_letter_create.assert_called_once()
+        mock_log_error.assert_called_once()
+
+        db_rm = RM.query.filter(RM.email == req.email).first()
+        self.assertIsNotNone(db_rm)
+        self.assertEqual('stripe-charge-id', db_rm.stripe_charge_id)
+        self.assertEqual(req.rep_id, db_rm.rep_id)
+        self.assertIsNone(db_rm.lob_letter_id)
+        self.assertIsNotNone(db_rm.time_created)
+        self.assertIsNotNone(db_rm.time_updated)
+        self.assertEqual(db_rm.time_updated, db_rm.time_created)
 
 if __name__ == '__main__':
     unittest.main()
