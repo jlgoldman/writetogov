@@ -108,3 +108,13 @@ class RepMailing(db.Model):
     lob_letter_id = db.Column(db.String(50), index=True)
     time_created = db.Column(db.DateTime(timezone=True))
     time_updated = db.Column(db.DateTime(timezone=True))
+
+class Issue(db.Model):
+    issue_id = db.Column(db.BigInteger, primary_key=True)
+    creator_email = db.Column(db.String(100), index=True)
+    creator_name = db.Column(db.String(100))
+    title = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    rep_ids = db.Column(postgresql.ARRAY(db.Integer))
+    time_created = db.Column(db.DateTime(timezone=True))
+    time_updated = db.Column(db.DateTime(timezone=True))

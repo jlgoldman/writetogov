@@ -1,0 +1,10 @@
+Your writetogov.com issue page "{{issue.title}}" has been created.
+
+You can view your page at {{issue_url}}.
+
+You can edit at your page at {{edit_url}}.
+
+Share you page with others:
+Facebook: https://www.facebook.com/sharer/sharer.php?u={{issue_url | urlencode}}
+Twitter: https://twitter.com/intent/tweet?url={{issue_url | urlencode}}
+Google+: https://plus.google.com/share?url={{issue_url | urlencode}}

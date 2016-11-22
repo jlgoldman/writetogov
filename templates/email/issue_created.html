@@ -1,0 +1,76 @@
+{% extends 'email/base_message.html' %}
+
+{% block subject %}{{subject}}{% endblock %}
+
+{% block message %}
+  <table>
+    <tr>
+      <td>
+        <font size="4">
+          Your writetogov.com issue page <b>{{issue.title}}</b> has been created.
+        </font>
+      </td>
+    </tr>
+  </table>
+  <table height="20px">
+  </table>
+
+  <table>
+    <tr>
+      <td>
+        You can view your page at <a href="{{issue_url}}">{{issue_url}}</a>.
+      </td>
+    </tr>
+  </table>
+  <table height="20px">
+  </table>
+
+  <table>
+    <tr>
+      <td>
+        You can edit at your page at <a href="{{edit_url}}">{{edit_url}}</a>.
+      </td>
+    </tr>
+  </table>
+  <table height="20px">
+  </table>
+
+
+  <table>
+    <tr>
+      <td>
+        Share your page with others:
+      </td>
+    </tr>
+  </table>
+  <table height="20px">
+  </table>
+
+  <center>
+    <table>
+      <tr>
+        <td>
+          <a href="https://www.facebook.com/sharer/sharer.php?u={{issue_url | urlencode}}">
+            <img src="https://www.writetogov.com/static/img/fb-circle-50.png"/>
+          </a>
+        </td>
+        <td width="30px">
+          &nbsp;
+        </td>
+        <td>
+          <a href="https://twitter.com/intent/tweet?url={{issue_url | urlencode}}">
+            <img src="https://www.writetogov.com/static/img/twitter-circle-50.png"/>
+          </a>
+        </td>
+        <td width="30px">
+          &nbsp;
+        </td>
+        <td>
+          <a href="https://plus.google.com/share?url={{issue_url | urlencode}}">
+            <img src="https://www.writetogov.com/static/img/gplus-circle-50.png"/>
+          </a>
+        </td>
+      </tr>
+    </table>
+  </center>
+{% endblock %}

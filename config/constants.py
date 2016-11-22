@@ -8,6 +8,7 @@ HTTPS = True
 PROJECTPATH = os.environ.get('PROJECTPATH')
 
 FLASK_SECRET_KEY = None
+PUBLIC_ID_ENCRYPTION_KEY = None
 
 APP_LOG_FILENAME = os.path.join(PROJECTPATH, 'app.log')
 

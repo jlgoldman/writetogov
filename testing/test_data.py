@@ -124,7 +124,7 @@ class RepData(DataSet):
         bioguide_id     = 'B001261'
         status          = db_models.Rep.Status.ACTIVE
         status_note     = None
-    class michel_enzi(object):
+    class michael_enzi(object):
         rep_id          = 31
         first_name      = 'Michael B.'
         last_name       = 'Enzi'

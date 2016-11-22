@@ -1,6 +1,5 @@
 import flask_testing
 
-from app import MyFlask
 from app import app
 from app import app_config
 from database import db
