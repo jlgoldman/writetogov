@@ -175,9 +175,26 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
         self.assertEqual('CA', resp.state)
         self.assertEqual('94103', resp.zip)
 
+    def test_newlines_converted_to_br(self):
+        req = letter.GenerateLetterRequest(
+            rep_id=pelosi.rep_id,
+            body='hello\nworld',
+            name_and_address='Bob Smith\nSan Francisco, CA')
+        html = self.service()._generate_html(req)
+        self.assertTrue('hello<br/>world' in html)
+        self.assertTrue('Bob Smith<br/>San Francisco, CA' in html)
+
+        req = letter.GenerateLetterRequest(
+            rep_id=pelosi.rep_id,
+            body='hello\r\nworld',
+            name_and_address='Bob Smith\r\nSan Francisco, CA')
+        html = self.service()._generate_html(req)
+        self.assertTrue('hello<br/>world' in html)
+        self.assertTrue('Bob Smith<br/>San Francisco, CA' in html)
+
 class SenderAddressParsingTest(unittest.TestCase):
     def parse(self, lines):
-        addr_string = '\r\n'.join(lines)
+        addr_string = '\n'.join(lines)
         return letter_service._sender_name_and_address_to_lob_address(addr_string)
 
     def test_basic_addr(self):

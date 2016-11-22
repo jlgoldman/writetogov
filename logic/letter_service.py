@@ -79,7 +79,8 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         db.session.commit()
 
         lob_response = self._make_lob_request(
-            pdf_buffer, api_rep, description, req.name_and_address)
+            pdf_buffer, api_rep, description,
+            _normalize_textarea_input(req.name_and_address))
         db_rep_mailing.lob_letter_id = lob_response['id']
         db_rep_mailing.time_updated = time_.utcnow()
         db.session.commit()
@@ -90,7 +91,8 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
             lob_pdf_url=lob_response['url'])
 
     def parse_address(self, req):
-        lob_address = _sender_name_and_address_to_lob_address(req.name_and_address)
+        lob_address = _sender_name_and_address_to_lob_address(
+            _normalize_textarea_input(req.name_and_address))
         return letter.ParseAddressResponse(
             name=lob_address.get('name'),
             line1=lob_address.get('address_line1'),
@@ -104,8 +106,8 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
             raise _invalid_rep_id_exception(req.rep_id)
         return flask.render_template('pdf/letter.html',
             rep=db_to_api.db_rep_to_api(db_rep),
-            body=req.body,
-            name_and_address=req.name_and_address,
+            body=_normalize_textarea_input(req.body),
+            name_and_address=_normalize_textarea_input(req.name_and_address),
             date_str=_date_str(),
             pdf_font_file=constants.PDF_FONT_FILE)
 
@@ -113,9 +115,10 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         db_rep = db_rep or R.query.get(req.rep_id)
         if not db_rep:
             raise _invalid_rep_id_exception(req.rep_id)
+        name_and_address = _normalize_textarea_input(req.name_and_address)
         return flask.render_template('pdf/address_page.html',
             rep=db_to_api.db_rep_to_api(db_rep),
-            sender_address=_make_sender_address(req.name_and_address),
+            sender_address=_make_sender_address(name_and_address),
             pdf_font_file=constants.PDF_FONT_FILE)
 
     def _charge_via_stripe(self, stripe_token, description):
@@ -186,12 +189,11 @@ def _date_str():
 
 def _make_sender_address(name_and_address):
     lines = []
-    delimiter = '\r\n' if '\r\n' in name_and_address else '\n'
-    for line in name_and_address.split(delimiter):
+    for line in name_and_address.split('\n'):
         is_phone_line = PHONE_RE.search(line) and not ZIP4_LINE_RE.search(line)
         if line and not is_phone_line and not EMAIL_RE.search(line):
             lines.append(line)
-    return '\r\n'.join(lines)
+    return '\n'.join(lines)
 
 def _api_rep_address_to_lob_address(api_rep):
     match = ADDRESS_DC_PARSE_RE.match(api_rep.address_dc)
@@ -206,7 +208,7 @@ def _api_rep_address_to_lob_address(api_rep):
 
 def _sender_name_and_address_to_lob_address(name_and_address):
     # Remove phone and email
-    lines = _make_sender_address(name_and_address).split('\r\n')
+    lines = _make_sender_address(name_and_address).split('\n')
     parsed = usaddress.parse(', '.join(lines[1:]))
     line1_parts = []
     place_name_parts = []
@@ -234,6 +236,11 @@ def _sender_name_and_address_to_lob_address(name_and_address):
         'address_country': 'US',
     }
 
+def _normalize_textarea_input(s):
+    if s:
+        return s.replace('\r\n', '\n')
+    return s
+
 # xhtml2pdf supports css white-space but not pre-line or pre-wrap,
 # seemingly only pre. So we have to roll our own pre-line to get
 # both wrapping and newlines.
@@ -241,5 +248,5 @@ def _sender_name_and_address_to_lob_address(name_and_address):
 def newline_to_br(s):
     s = s or ''
     escaped = unicode(app.jinja_env.filters['escape'](s))
-    replaced = escaped.replace('\r\n', '<br/>')
+    replaced = escaped.replace('\n', '<br/>')
     return app.jinja_env.filters['safe'](replaced)
