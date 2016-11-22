@@ -352,6 +352,27 @@ h3.tips-title {
   text-align: center;
 }
 
+.issue-form .rep-input-container {
+  margin: 20px 0;
+}
+
+.issue-form .selected-reps {
+  margin-top: 20px;
+}
+
+.issue-form .delete-icon {
+  text-align: right;
+}
+
+.issue-form .delete-icon a {
+  color: #777;
+}
+
+.issue-form .delete-icon a:hover {
+  color: #ccc;
+}
+
+
 md-input-container .hint {
   position: absolute;
   left: 2px;

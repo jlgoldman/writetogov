@@ -35,3 +35,19 @@
     </a>
   </footer>
 </script>
+
+<script type="text/ng-template" id="rep-autocomplete-input-template">
+  <md-autocomplete
+    md-selected-item="form.selectedSearchItem"
+    md-search-text="form.searchText"
+    md-items="item in textSearch(form.searchText)"
+    md-item-text="item.name"
+    md-min-length="0"
+    placeholder="e.g. 'nancy pelosi', 'california', 'ca 12th'">
+    <md-item-template>
+      <span md-highlight-text="form.searchText" md-highlight-flags="i">
+        [[item.name]] - [[item.stateName]] [[item.title]] [[item.districtOrdinal ? ' - ' + item.districtOrdinal + ' district' : '']]
+      </span>
+    </md-item-template>
+  </md-autocomplete>
+</script>

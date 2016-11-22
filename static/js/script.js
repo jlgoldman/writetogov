@@ -374,11 +374,30 @@ var IssueFormState = {
   UPDATE: 2
 };
 
-function IssueFormCtrl($scope, $issue, $token, $issueService) {
+var RepMode = {
+  ALL: 1,
+  SPECIFIC: 2
+};
+
+function IssueFormCtrl($scope, $issue, $token, $issueService, $repAutocompleteData) {
+  function makeSelectedRepItems(issue) {
+    if (!issue || _.isEmpty(issue['rep_ids'])) {
+      return [];
+    }
+    var matchingRows = _.filter($repAutocompleteData, function(row) {
+      var rowRepId = row[0];
+      return issue['rep_ids'].indexOf(rowRepId) != -1;
+    });
+    return _.map(matchingRows, repAutocompleteRowToItem);
+  }
+
   $scope.form = {
     issue: $issue || {},
-    creatorEmail: null
+    creatorEmail: null,
+    repMode: $issue && !_.isEmpty($issue['rep_ids']) ? RepMode.SPECIFIC : RepMode.ALL,
+    selectedRepItems: makeSelectedRepItems($issue)
   };
+  $scope.RepMode = RepMode;
   $scope.state = {
     formState: $issue ? IssueFormState.UPDATE : IssueFormState.CREATE,
     submitting: false,
@@ -449,7 +468,87 @@ function IssueFormCtrl($scope, $issue, $token, $issueService) {
         }
       });
   };
-};
+
+  $scope.repItemSelected = function(item) {
+    if (!item) return;
+    var repIds = $scope.form.issue['rep_ids'];
+    if (_.isEmpty(repIds) || repIds.indexOf(item.repId) == -1) {
+       $scope.form.issue['rep_ids'] = repIds = repIds || [];
+       repIds.push(item.repId);
+       $scope.form.selectedRepItems.push(item);
+    }
+  };
+
+  $scope.removeRepItem = function(item) {
+    $scope.form.selectedRepItems = _.without($scope.form.selectedRepItems, item);
+    $scope.form.issue['rep_ids'] = _.without($scope.form.issue['rep_ids'], item.repId);
+  };
+
+  $scope.$watch('form.repMode', function(mode, oldMode) {
+    if (mode == RepMode.ALL && mode != oldMode) {
+      $scope.form.selectedRepItems = [];
+      $scope.form.issue['rep_ids'] = [];
+    }
+  });
+}
+
+function repAutocompleteRowToItem(row) {
+  return {
+    repId: row[0],
+    name: row[1] ? row[1] + ' ' + row[2] : '(vacant)',
+    stateName: row[4],
+    districtOrdinal: row[7],
+    title: row[8]
+  };
+}
+
+function repAutocompleteInput() {
+  return {
+    scope: {
+      onSelect: '&'
+    },
+    templateUrl: 'rep-autocomplete-input-template',
+    controller: function($scope, $repAutocompleteData) {
+      $scope.form = {
+        searchText: null,
+        selectedSearchItem: null
+      };
+
+      $scope.$watch('form.selectedSearchItem', function(item, oldItem) {
+        if (item !== oldItem) {
+          $scope.onSelect({$item: item});
+          $scope.form.searchText = null;
+        };
+      });
+
+      $scope.textSearch = function(query) {
+        if (!query) {
+          return [];
+        }
+
+        function queryPartMatches(queryPart, row) {
+          return _.some(row, function(rowPart) {
+            return rowPart && rowPart.indexOf && rowPart.toLowerCase().indexOf(queryPart) == 0;
+          });
+        }
+
+        var parts = _.map(query.split(/\s+/), function(s) {
+          return s.toLowerCase();
+        });
+        var matchingRows = _.filter($repAutocompleteData, function(row) {
+          var isMatch = true;
+          _.each(parts, function(queryPart) {
+            if (queryPart && !queryPartMatches(queryPart, row)) {
+              isMatch = false;
+            }
+          });
+          return isMatch;
+        });
+        return _.map(matchingRows, repAutocompleteRowToItem);
+      };
+    }
+  };
+}
 
 function googlePlaceAutocomplete($parse) {
   return {
@@ -630,8 +729,10 @@ function initIssueCreateEdit(clientConfig) {
   var module = angular.module('issueCreateEditApp', ['ngMaterial'], BRACKET_INTERPOLATOR)
     .controller('IssueFormCtrl', IssueFormCtrl)
     .service('$issueService', IssueService)
+    .directive('repAutocompleteInput', repAutocompleteInput)
     .value('$issue', clientConfig['issue'])
     .value('$token', clientConfig['token'])
+    .value('$repAutocompleteData', clientConfig['rep_autocomplete_data'])
     .filter('encodeuricomponent', function() {
       return function(value) {
         return encodeURIComponent(value);

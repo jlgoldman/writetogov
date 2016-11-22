@@ -70,6 +70,33 @@
       <div class="hint">(Optional) If you want this displayed on your page.</div>
     </md-input-container>
 
+    <md-radio-group ng-model="form.repMode">
+      <md-radio-button ng-value="RepMode.ALL" class="md-primary">
+        Let people find their local representatives to contact
+      </md-radio-button>
+      <md-radio-button ng-value="RepMode.SPECIFIC">
+        Select specific representatives I would like them to contact
+      </md-radio-button>
+    </md-radio-group>
+
+    <div ng-if="form.repMode == RepMode.SPECIFIC" class="rep-input-container">
+      <rep-autocomplete-input on-select="repItemSelected($item)">
+      </rep-autocomplete-input>
+
+      <div class="selected-reps">
+        <div ng-repeat="item in form.selectedRepItems" layout="row" flex>
+          <div flex="90">
+            [[item.name]] - [[item.stateName]] [[item.title]] [[item.districtOrdinal ? ' - ' + item.districtOrdinal + ' district' : '']]
+          </div>
+          <div flex="10" class="delete-icon">
+            <a href="javascript:void(0)" ng-click="removeRepItem(item)">
+              <i class="material-icons">delete</i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <md-input-container ng-if="state.formState == IssueFormState.CREATE">
       <label>Your Email</label>
       <input type="text" ng-model="form.creatorEmail" required/>
