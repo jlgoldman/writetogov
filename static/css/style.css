@@ -331,6 +331,49 @@ h3.tips-title {
   margin-top: 25px;
 }
 
+.issue-form .headline {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 36px;
+  line-height: 36px;
+}
+
+.issue-form {
+  width: 500px;
+  max-width: calc(100% - 60px);
+  margin: 0 auto 50px auto;
+}
+
+.issue-form .button-panel {
+  text-align: center;
+}
+
+.issue-form .social-icon {
+  text-align: center;
+}
+
+md-input-container .hint {
+  position: absolute;
+  left: 2px;
+  right: auto;
+  bottom: 7px;
+  font-size: 12px;
+  line-height: 14px;
+  transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+  color: #777;
+}
+md-input-container .hint.ng-hide,
+md-input-container .hint.ng-enter,
+md-input-container .hint.ng-leave.ng-leave-active {
+  bottom: 26px;
+  opacity: 0;
+}
+md-input-container .hint.ng-leave,
+md-input-container .hint.ng-enter.ng-enter-active {
+  bottom: 7px;
+  opacity: 1;
+}
+
 .footer {
   text-align: center;
   width: 100%;

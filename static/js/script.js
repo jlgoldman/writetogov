@@ -369,6 +369,88 @@ function repCard() {
   };
 }
 
+var IssueFormState = {
+  CREATE: 1,
+  UPDATE: 2
+};
+
+function IssueFormCtrl($scope, $issue, $token, $issueService) {
+  $scope.form = {
+    issue: $issue || {},
+    creatorEmail: null
+  };
+  $scope.state = {
+    formState: $issue ? IssueFormState.UPDATE : IssueFormState.CREATE,
+    submitting: false,
+    success: false,
+    deleteConfirmationOpen: false,
+    deleteSuccess: false
+  };
+  $scope.IssueFormState = IssueFormState;
+  $scope.issuePageUrl = null;
+  $scope.errors = [];
+
+  $scope.formComplete = function() {
+    return ($scope.form.creatorEmail || $scope.state.formState == IssueFormState.UPDATE)
+      && $scope.form.issue['title']
+      && $scope.form.issue['description'];
+  };
+
+  $scope.submitCreate = function() {
+    $scope.state.submitting = true;
+    $scope.errors = [];
+    $issueService.create($scope.form.creatorEmail, $scope.form.issue)
+      .then(function(response) {
+        $scope.state.submitting = false;
+        $scope.state.success = true;
+        $scope.issuePageUrl = response.data['issue']['url'];
+      }, function(response) {
+        $scope.state.submitting = false;
+        $scope.errors = response.data && response.data['errors'];
+        if (!$scope.errors || !$scope.errors.length) {
+          $scope.errors = [{'message': 'There was an error creating your page. Please try again or contact info@writetogov.com.'}];
+        }
+      });
+  };
+
+  $scope.submitUpdate = function() {
+    $scope.state.submitting = true;
+    $scope.errors = [];
+    $issueService.update($token, $scope.form.issue)
+      .then(function(response) {
+        $scope.state.submitting = false;
+        $scope.state.success = true;
+        $scope.issuePageUrl = response.data['issue']['url'];
+      }, function(response) {
+        $scope.state.submitting = false;
+        $scope.errors = response.data && response.data['errors'];
+        if (!$scope.errors || !$scope.errors.length) {
+          $scope.errors = [{'message': 'There was an error updating your page. Please try again or contact info@writetogov.com.'}];
+        }
+      });
+  };
+
+  $scope.openDeleteConfirmation = function() {
+    $scope.state.deleteConfirmationOpen = true;
+  };
+
+  $scope.submitDelete = function() {
+    $scope.state.submitting = true;
+    $scope.errors = [];
+    $issueService.delete($token, $scope.form.issue['issue_id'])
+      .then(function(response) {
+        $scope.state.submitting = false;
+        $scope.state.deleteSuccess = true;
+      }, function(response) {
+        $scope.state.submitting = false;
+        $scope.errors = response.data && response.data['errors'];
+        if (!$scope.errors || !$scope.errors.length) {
+          $scope.errors = [{'message': 'There was an error deleting your page. Please try again or contact info@writetogov.com.'}];
+        }
+      });
+  };
+};
+
 function googlePlaceAutocomplete($parse) {
   return {
     require: 'ngModel',
@@ -446,6 +528,32 @@ function LetterService($http) {
   };
 }
 
+function IssueService($http) {
+  this.create = function(creatorEmail, issue) {
+    var req = {
+      'creator_email': creatorEmail,
+      'issue': issue
+    };
+    return $http.post('/issue_service/create', req);
+  };
+
+  this.update = function(token, issue) {
+    var req = {
+      'token': token,
+      'issue': issue
+    };
+    return $http.post('/issue_service/update', req);
+  };
+
+  this.delete = function(token, issueId) {
+    var req = {
+      'token': token,
+      'issue_id': issueId
+    };
+    return $http.post('/issue_service/delete', req);
+  };
+}
+
 function PageTransitioner($document, $location, $preloadData) {
   this.goToComposePage = function(repId) {
     $preloadData.clear();
@@ -484,8 +592,19 @@ var BRACKET_INTERPOLATOR = function ($interpolateProvider) {
   $interpolateProvider.endSymbol(']]');
 }
 
+function commonConfig(module) {
+  module
+    .config(themeConfig)
+    .config(function($mdGestureProvider) {
+      // See https://github.com/angular/material/issues/1441
+      // In this case, causes taps on Google Place Autocomplete
+      // results on mobile to be ignored without this.
+      $mdGestureProvider.skipClickHijack();
+    });
+}
+
 function initMain(clientConfig) {
-  angular.module('mainApp', ['ngMaterial', 'ngRoute'], BRACKET_INTERPOLATOR)
+  var module = angular.module('mainApp', ['ngMaterial', 'ngRoute'], BRACKET_INTERPOLATOR)
     .controller('IndexCtrl', IndexCtrl)
     .controller('DistrictCtrl', DistrictCtrl)
     .controller('ReminderCtrl', ReminderCtrl)
@@ -503,12 +622,20 @@ function initMain(clientConfig) {
     .value('$preloadData', new PreloadData(clientConfig['rep'], clientConfig['lookup_response']))
     .value('$StripeCheckout', window['StripeCheckout'])
     .value('$stripePublishableKey', clientConfig['stripe_publishable_key'])
-    .config(routeConfig)
-    .config(themeConfig)
-    .config(function($mdGestureProvider) {
-      // See https://github.com/angular/material/issues/1441
-      // In this case, causes taps on Google Place Autocomplete
-      // results on mobile to be ignored without this.
-      $mdGestureProvider.skipClickHijack();
+    .config(routeConfig);
+  commonConfig(module);
+}
+
+function initIssueCreateEdit(clientConfig) {
+  var module = angular.module('issueCreateEditApp', ['ngMaterial'], BRACKET_INTERPOLATOR)
+    .controller('IssueFormCtrl', IssueFormCtrl)
+    .service('$issueService', IssueService)
+    .value('$issue', clientConfig['issue'])
+    .value('$token', clientConfig['token'])
+    .filter('encodeuricomponent', function() {
+      return function(value) {
+        return encodeURIComponent(value);
+      };
     });
+  commonConfig(module);
 }

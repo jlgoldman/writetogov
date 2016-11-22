@@ -7,6 +7,7 @@ from PyPDF2 import PdfFileReader
 from logic import reminder_service
 from testing import test_base
 from testing import test_data
+from util import ids
 from views import web_views
 assert web_views  # Silence pyflakes
 
@@ -71,6 +72,18 @@ class WebViewsTest(test_base.DatabaseWithTestdataTest):
         self.assertEqual('foo@foo.com', update_req.email)
         self.assertEqual('blah', update_req.token)
         self.assertEqual('UNSUBSCRIBED', update_req.status)
+
+    def test_create_issue_page(self):
+        resp = self.client.get('/issue/create')
+        self.assertEqual(200, resp.status_code)
+
+    def test_edit_issue_page(self):
+        issue_data = test_data.IssueData.issue1
+        resp = self.client.get('/issue/%s/edit?token=issuetoken' %
+            ids.public_id(issue_data.issue_id))
+        self.assertEqual(200, resp.status_code)
+        self.assertTrue('issuetoken' in resp.data)
+        self.assertTrue(issue_data.description in resp.data)
 
 if __name__ == '__main__':
     unittest.main()

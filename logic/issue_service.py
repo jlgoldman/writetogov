@@ -19,7 +19,7 @@ class IssueServiceImpl(issue.IssueService, apilib.ServiceImplementation):
         pass
 
     def get(self, req):
-        db_issue = I.query.get(req.issue_id)
+        db_issue = I.query.get(req.issue_id) if req.issue_id else None
         return issue.GetIssueResponse(
             issue=_db_issue_to_api(db_issue))
 
@@ -109,7 +109,8 @@ def _db_issue_to_api(db_issue):
         creator_name=db_issue.creator_name,
         title=db_issue.title,
         description=db_issue.description,
-        rep_ids=db_issue.rep_ids)
+        rep_ids=db_issue.rep_ids,
+        url=urls.absurl('/issue/%s' % ids.public_id(db_issue.issue_id)))
 
 def _verify_issue_token(token, email, issue_id):
     email = email.strip().lower()
@@ -131,21 +132,19 @@ def _generate_issue_token(email, issue_id):
 
 def _make_edit_url(email, issue_id):
     token = _generate_issue_token(email, issue_id)
-    return urls.absurl('/issue/edit/%s' % token)
+    path = '/issue/%s/edit' % ids.public_id(issue_id)
+    return urls.absurl(urls.append_params(path, {'token': token}))
 
 def _send_creation_email(email, api_issue):
     edit_url = _make_edit_url(email, api_issue.issue_id)
-    issue_url = urls.absurl('/issue/%s' % ids.public_id(api_issue.issue_id))
     subject = 'Your writetogov.com page "%s" has been created' % api_issue.title
 
     html = render_template('email/issue_created.html',
         subject=subject,
         issue=api_issue,
-        issue_url=issue_url,
         edit_url=edit_url)
     text = render_template('email/issue_created.txt',
         issue=api_issue,
-        issue_url=issue_url,
         edit_url=edit_url)
 
     sendgrid_.send_message(

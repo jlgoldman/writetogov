@@ -197,14 +197,26 @@ class DistrictData(DataSet):
         # Simplified polygon for testing
         geog          = 'MULTIPOLYGON(((-111.054556 45.000955,-104.057879 44.997605,-104.053249 41.001406,-111.046815 40.997875,-111.054556 45.000955)))'
 
+class IssueData(DataSet):
+    class issue1(object):
+        issue_id = 111
+        creator_email = 'bob@smith.com'
+        creator_name = 'Bob Smith'
+        title = 'Issue 1 Title'
+        description = 'Issue 1 Description'
+        rep_ids = [RepData.nancy_pelosi.rep_id]
+        time_created = '2016-11-22 13:26:34.731239-08'
+        time_updated = '2016-11-22 13:26:34.731239-08'
+
 def setup_testdata():
     dbfixture = SQLAlchemyFixture(
         engine=db.engine,
         env={
             'RepData': db_models.Rep,
             'DistrictData': db_models.District,
+            'IssueData': db_models.Issue,
             })
     fixture_datas = [
-        dbfixture.data(RepData, DistrictData),
+        dbfixture.data(RepData, DistrictData, IssueData),
         ]
     return dbfixture, fixture_datas

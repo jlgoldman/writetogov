@@ -3,6 +3,7 @@ import functools
 import apilib
 import flask
 from flask import json
+from flask import redirect
 from flask import render_template
 from flask import request
 
@@ -66,6 +67,21 @@ def generate_letter():
         return 'There was an error generating your letter', response_code
     return flask.Response(resp.pdf_content, mimetype='application/pdf',
         headers={'Content-Disposition': 'attachment; filename=letter.pdf'})
+
+@app.route('/issue/create')
+@app.route('/issue/<public_issue_id>/edit')
+def issue_create_edit(public_issue_id=None):
+    api_issue = None
+    if public_issue_id:
+        api_issue = api_shortcuts.get_issue_by_public_id(public_issue_id)
+        if not api_issue:
+            return redirect('/issue/create')
+    return render_template('issue_create_edit.html',
+        client_config=dict(
+            issue=api_issue.to_json() if api_issue else None,
+            token=request.args.get('token'),
+            rep_autocomplete_data=AUTOCOMPLETE_DATA,
+        ))
 
 @app.route('/reminder/unsubscribe')
 def reminder_unsubscribe():

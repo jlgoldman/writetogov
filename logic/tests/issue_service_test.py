@@ -46,6 +46,7 @@ class IssueServiceTest(test_base.DatabaseWithTestdataTest):
         self.assertEqual(req.issue.title, resp.issue.title)
         self.assertEqual(req.issue.description, resp.issue.description)
         self.assertEqual(req.issue.rep_ids, resp.issue.rep_ids)
+        self.assertIsNotNone(resp.issue.url)
 
         db_issue = I.query.get(resp.issue.issue_id)
         self.assertIsNotNone(db_issue)

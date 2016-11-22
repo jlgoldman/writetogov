@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block ng_app %}issueCreateEditApp{% endblock %}
+
+{% set title = 'Create an Issue Page - Write to the Government' %}
+{% set description = 'Create an Issue Page to encourage others to write their elected officials about an issue you feel strongly about.' %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block extra_meta_tags %}
+  <meta property="og:title"       content="{{og_title}}"/>
+  <meta property="og:description" content="{{description}}"/>
+  <meta property="og:image"       content="https://www.writetogov.com/static/img/og-image-1200.jpg"/>
+
+  <meta name="twitter:url" content="{{canonical_url}}"/>
+  <meta name="twitter:title" content="{{title}}"/>
+  <meta name="twitter:description" content="{{description}}"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:image" content="https://www.writetogov.com/static/img/og-image-1200.jpg"/>
+{% endblock %}
+
+{% block content %}
+<ng-include src="'navbar-template'"></ng-include>
+<div class="container issue-container">
+  <ng-include src="'issue-form-template'"></ng-include>
+</div>
+<ng-include src="'footer-template'"></ng-include>
+{% endblock %}
+
+{% block extra_scripts %}
+
+{% include 'common_elements.html' %}
+
+<script type="text/ng-template" id="issue-form-template">
+  <div ng-controller="IssueFormCtrl" class="issue-form" layout="column" flex>
+    <div class="headline">
+      <span ng-if="state.formState == IssueFormState.CREATE">
+        Create an Issue Page
+      </span>
+      <span ng-if="state.formState == IssueFormState.UPDATE">
+        Update Your Issue Page
+      </span>
+    </div>
+    <div ng-if="state.formState == IssueFormState.CREATE">
+      <p>
+        Encourage others to contact representatives about an issue you feel strongly about.
+        Describe the issue here and then share your page with others.
+      </p>
+      <p>
+        You can allow people to find their local representatives on your page,
+        or indicate specific representatives you believe they should contact.
+      </p>
+    </div>
+    <p ng-if="state.formState == IssueFormState.UPDATE">
+      {# Spacer #}
+      &nbsp;
+    </p>
+
+    <md-input-container>
+      <label>Title</label>
+      <input type="text" ng-model="form.issue['title']" required/>
+    </md-input-container>
+    <md-input-container>
+      <label>Description</label>
+      <textarea ng-model="form.issue['description']" rows="5" required></textarea>
+    </md-input-container>
+    <md-input-container>
+      <label>Your Name</label>
+      <input type="text" ng-model="form.issue['creator_name']"/>
+      <div class="hint">(Optional) If you want this displayed on your page.</div>
+    </md-input-container>
+
+    <md-input-container ng-if="state.formState == IssueFormState.CREATE">
+      <label>Your Email</label>
+      <input type="text" ng-model="form.creatorEmail" required/>
+      <div class="hint">This will remain private and is only used to send you a confirmation email.</div>
+    </md-input-container>
+
+    <div class="button-panel" ng-show="!state.deleteConfirmationOpen">
+      <md-button ng-if="state.formState == IssueFormState.CREATE"
+        class="md-primary md-raised" ng-click="submitCreate()"
+        ng-disabled="!formComplete() || state.submitting || state.success">
+        Create
+      </md-button>
+
+      <md-button ng-if="state.formState == IssueFormState.UPDATE"
+        class="md-primary md-raised" ng-click="submitUpdate()"
+        ng-disabled="!formComplete() || state.submitting || state.success">
+        Update
+      </md-button>
+
+      <md-button ng-if="state.formState == IssueFormState.UPDATE"
+        class="md-raised" ng-click="openDeleteConfirmation()"
+        ng-disabled="state.submitting || state.success">
+        Delete
+      </md-button>
+    </div>
+
+    <md-progress-circular md-mode="indeterminate" ng-show="state.submitting" class="center-progress">
+    </md-progress-circular>
+
+    <div ng-if="errors && errors.length">
+      <p ng-repeat="error in errors" md-colors="{color:'warn'}">
+        [[error['message'] ]]
+      </p>
+    </div>
+
+    <div ng-if="state.success">
+      <p md-colors="{color:'primary'}" class="center-text md-headline">
+        <span ng-if="state.formState == IssueFormState.CREATE">
+          Your issue page has been created successfully!
+        </span>
+        <span ng-if="state.formState == IssueFormState.UPDATE">
+          Your issue page has been updated successfully!
+        </span>
+      </p>
+      <p>
+        Your page can be found at <a ng-href="[[issuePageUrl]]" target="_blank">[[issuePageUrl]]</a>
+      </p>
+      <p>
+        Send the link to others or share it on social media:
+      </p>
+      <div layout-gt-xs="row" layout="column" flex layout-align="center center">
+        <div flex="33" class="social-icon">
+          <a href="https://www.facebook.com/sharer/sharer.php?u=[[issuePageUrl | encodeuricomponent]]">
+            <img src="/static/img/fb-circle-50.png"/>
+          </a>
+        </div>
+        <div flex="33" class="social-icon">
+          <a href="https://twitter.com/intent/tweet?url=[[issuePageUrl | encodeuricomponent]]">
+            <img src="/static/img/twitter-circle-50.png"/>
+          </a>
+        </div>
+        <div flex="33" class="social-icon">
+          <a href="https://plus.google.com/share?url=[[issuePageUrl | encodeuricomponent]]">
+            <img src="/static/img/gplus-circle-50.png"/>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="state.deleteConfirmationOpen">
+      <p md-colors="{color:'warn'}" class="center-text">
+        Are you sure you want to delete this page?
+      </p>
+      <div class="button-panel">
+        <md-button class="md-primary md-raised" ng-click="submitDelete()"
+          ng-disabled="state.submitting || state.deleteSuccess">
+          Delete
+        </md-button>
+
+        <md-button class="md-raised" ng-click="state.deleteConfirmationOpen = false"
+          ng-disabled="state.submitting || state.deleteSuccess">
+          Cancel
+        </md-button>
+      </div>
+      <p ng-if="state.deleteSuccess" md-colors="{color:'primary'}" class="center-text md-headline">
+        Your page has been deleted successfully.
+      </p>
+    </div>
+
+  </div>
+</script>
+
+<script>
+  initIssueCreateEdit({{client_config | tojson}});
+</script>
+{% endblock %}

@@ -6,6 +6,7 @@ class Issue(apilib.Model):
     title = apilib.Field(apilib.String(), required='create')
     description = apilib.Field(apilib.String(), required='create')
     rep_ids = apilib.Field(apilib.ListType(apilib.Integer()), validators=[apilib.Unique()])
+    url = apilib.Field(apilib.String(), readonly=True)
 
 class GetIssueRequest(apilib.Request):
     issue_id = apilib.Field(apilib.EncryptedId(), required=True)
