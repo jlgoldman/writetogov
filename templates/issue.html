@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block ng_app %}issueApp{% endblock %}
+
+{% set title = '%s - Write to the Government' | format(issue.title) %}
+{% set description = issue.description %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block extra_meta_tags %}
+  <meta property="og:title"       content="{{title}}"/>
+  <meta property="og:description" content="{{description}}"/>
+  <meta property="og:image"       content="https://www.writetogov.com/static/img/og-image-1200.jpg"/>
+
+  <meta name="twitter:url" content="{{canonical_url}}"/>
+  <meta name="twitter:title" content="{{title}}"/>
+  <meta name="twitter:description" content="{{description}}"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:image" content="https://www.writetogov.com/static/img/og-image-1200.jpg"/>
+{% endblock %}
+
+{% block content %}
+<ng-include src="'navbar-template'"></ng-include>
+<div class="container">
+  <ng-include src="'issue-template'"></ng-include>
+</div>
+<ng-include src="'footer-template'"></ng-include>
+{% endblock %}
+
+{% block extra_scripts %}
+
+{% include 'common_elements.html' %}
+
+<script type="text/ng-template" id="issue-template">
+  <div ng-controller="IssueCtrl" class="issue">
+    <div class="title">[[issue['title'] ]]</div>
+    <div ng-if="issue['creator_name']" class="creator-name">
+      Created by [[issue['creator_name'] ]]
+    </div>
+    <div class="description">[[issue['description'] ]]</div>
+
+    <div ng-if="!reps">
+      <div class="contact-reps-cta">
+        Find and contact your local representatives:
+      </div>
+      <div class="address-input-wrapper">
+        <input type="text" ng-model="form.address"
+          class="address-input" placeholder="Address"
+          google-place-autocomplete on-select="placeSelected($place)"
+          autofocus/>
+      </div>
+      <md-progress-circular md-mode="indeterminate" ng-show="loading" class="center-progress">
+      </md-progress-circular>
+    </div>
+    <div ng-if="reps">
+      <div class="contact-reps-cta">
+        Contact these representatives:
+      </div>
+      <div layout="row" layout-wrap layout-align="center none">
+        <rep-card ng-repeat="rep in reps" rep="rep"></rep-card>
+      </div>
+    </div>
+
+    <div>
+      <div class="get-involved-cta">
+        Get involved by sharing this page with others:
+      </div>
+      <div layout="row" flex layout-align="center none" class="social-icons">
+        <div flex="33" class="social-icon">
+          <a href="https://www.facebook.com/sharer/sharer.php?u=[[issue['url'] | encodeuricomponent]]">
+            <img src="/static/img/fb-circle-50.png"/>
+          </a>
+        </div>
+        <div flex="33" class="social-icon">
+          <a href="https://twitter.com/intent/tweet?url=[[issue['url'] | encodeuricomponent]]">
+            <img src="/static/img/twitter-circle-50.png"/>
+          </a>
+        </div>
+        <div flex="33" class="social-icon">
+          <a href="https://plus.google.com/share?url=[[issue['url'] | encodeuricomponent]]">
+            <img src="/static/img/gplus-circle-50.png"/>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key={{google_maps_api_key}}"></script>
+
+<script>
+  initIssue({{client_config | tojson}});
+</script>
+{% endblock %}

@@ -12,6 +12,12 @@ def get_rep_by_id(rep_id):
     resp = service.invoke('get', req)
     return resp.reps[0] if resp.reps else None
 
+def get_reps_by_ids(rep_ids):
+    service = rep_service.RepServiceImpl()
+    req = rep.GetRepsRequest(rep_ids=rep_ids)
+    resp = service.invoke('get', req)
+    return resp.reps
+
 def lookup_reps_by_district_code(district_code):
     service = rep_service.RepServiceImpl()
     req = rep.LookupRepsRequest(district_code=district_code)

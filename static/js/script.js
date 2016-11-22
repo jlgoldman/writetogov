@@ -379,6 +379,21 @@ var RepMode = {
   SPECIFIC: 2
 };
 
+function IssueCtrl($scope, $issue, $reps, $repService, $window) {
+  $scope.issue = $issue;
+  $scope.reps = $reps;
+  $scope.loading = false;
+
+  $scope.placeSelected = function(place) {
+    $scope.loading = true;
+    var location = place.geometry.location;
+    $repService.lookupByLatLng(location.lat(), location.lng())
+      .then(function(response) {
+        $window.location.href = '/district/' + response.data['house_rep']['district_code']
+      });
+  };
+}
+
 function IssueFormCtrl($scope, $issue, $token, $issueService, $repAutocompleteData) {
   function makeSelectedRepItems(issue) {
     if (!issue || _.isEmpty(issue['rep_ids'])) {
@@ -722,6 +737,22 @@ function initMain(clientConfig) {
     .value('$StripeCheckout', window['StripeCheckout'])
     .value('$stripePublishableKey', clientConfig['stripe_publishable_key'])
     .config(routeConfig);
+  commonConfig(module);
+}
+
+function initIssue(clientConfig) {
+  var module = angular.module('issueApp', ['ngMaterial'], BRACKET_INTERPOLATOR)
+    .controller('IssueCtrl', IssueCtrl)
+    .service('$repService', RepService)
+    .directive('repCard', repCard)
+    .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)
+    .value('$issue', clientConfig['issue'])
+    .value('$reps', clientConfig['reps'])
+    .filter('encodeuricomponent', function() {
+      return function(value) {
+        return encodeURIComponent(value);
+      };
+    });
   commonConfig(module);
 }
 

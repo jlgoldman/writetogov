@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+f{% extends 'base.html' %}
 
 {% block ng_app %}issueCreateEditApp{% endblock %}
 
@@ -8,7 +8,7 @@
 {% block title %}{{title}}{% endblock %}
 
 {% block extra_meta_tags %}
-  <meta property="og:title"       content="{{og_title}}"/>
+  <meta property="og:title"       content="{{title}}"/>
   <meta property="og:description" content="{{description}}"/>
   <meta property="og:image"       content="https://www.writetogov.com/static/img/og-image-1200.jpg"/>
 
@@ -21,7 +21,7 @@
 
 {% block content %}
 <ng-include src="'navbar-template'"></ng-include>
-<div class="container issue-container">
+<div class="container">
   <ng-include src="'issue-form-template'"></ng-include>
 </div>
 <ng-include src="'footer-template'"></ng-include>
@@ -147,7 +147,7 @@
       <p>
         Send the link to others or share it on social media:
       </p>
-      <div layout-gt-xs="row" layout="column" flex layout-align="center center">
+      <div layout="row" flex layout-align="center none">
         <div flex="33" class="social-icon">
           <a href="https://www.facebook.com/sharer/sharer.php?u=[[issuePageUrl | encodeuricomponent]]">
             <img src="/static/img/fb-circle-50.png"/>

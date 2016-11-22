@@ -403,48 +403,6 @@
   </div>
 </script>
 
-<script type="text/ng-template" id="rep-card-template">
-  <md-card class="rep-card">
-    <md-card-title>
-      <md-card-title-text>
-        <span class="md-headline">
-          <span ng-if="rep['status'] == RepStatus.LEFT_CONGRESS">(Vacant)</span>
-          <span ng-if="rep['status'] != RepStatus.LEFT_CONGRESS">
-            [[rep['title_short'] ]] [[rep['first_name'] ]] [[rep['last_name'] ]]
-          </span>
-        </span>
-        <span ng-if="extraTitle" md-colors="{color:'accent'}">[[extraTitle]]</span>
-        <span class="md-subhead">
-          [[rep['state_name'] ]]
-          <span ng-if="rep['chamber'] == 'HOUSE'">
-            [[rep['district_ordinal'] ]] District
-          </span>
-          ([[rep['party_code'] ]])
-        </span>
-        <span ng-if="statusMessage" md-colors="{color:'warn'}">[[statusMessage]]</span>
-      </md-card-title-text>
-      <md-card-title-media>
-        <div class="md-media-md card-media rep-photo-wrapper">
-          <img ng-src="[[rep['photo_url'] ]]" class="rep-photo"/>
-        </div>
-      </md-card-title-media>
-    </md-card-title>
-    <md-card-content>
-      <div ng-repeat="line in rep['address_dc_lines']">
-        [[line]]
-      </div>
-      <div class="phone">
-        <a ng-href="tel:[[rep['phone_dc'] ]]" md-colors="{color:'primary'}">[[rep['phone_dc'] ]]</a>
-      </div>
-    </md-card-content>
-    <md-card-actions layout="row" layout-align="end center" ng-if="!hideActions">
-      <a ng-href="/compose/[[rep['rep_id'] ]]">
-        <md-button class="md-primary md-raised">Write a Letter</md-button>
-      </a>
-    </md-card-actions>
-  </md-card>
-</script>
-
 <script type="text/ng-template" id="rep-stripe-form-template">
   <div class="rep-stripe-form">
     <div ng-if="!submitting">

@@ -73,6 +73,11 @@ class WebViewsTest(test_base.DatabaseWithTestdataTest):
         self.assertEqual('blah', update_req.token)
         self.assertEqual('UNSUBSCRIBED', update_req.status)
 
+    def test_get_issue_page(self):
+        issue_data = test_data.IssueData.issue1
+        resp = self.client.get('/issue/%s' % ids.public_id(issue_data.issue_id))
+        self.assertEqual(200, resp.status_code)
+
     def test_create_issue_page(self):
         resp = self.client.get('/issue/create')
         self.assertEqual(200, resp.status_code)

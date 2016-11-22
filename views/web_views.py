@@ -83,6 +83,22 @@ def issue_create_edit(public_issue_id=None):
             rep_autocomplete_data=AUTOCOMPLETE_DATA,
         ))
 
+@app.route('/issue/<public_issue_id>')
+def issue(public_issue_id):
+    api_issue = api_shortcuts.get_issue_by_public_id(public_issue_id)
+    if not api_issue:
+        return '', 404
+    api_reps = None
+    if api_issue.rep_ids:
+        api_reps = api_shortcuts.get_reps_by_ids(api_issue.rep_ids)
+    return render_template('issue.html',
+        issue=api_issue,
+        google_maps_api_key=constants.GOOGLE_MAPS_API_KEY,
+        client_config=dict(
+            issue=api_issue.to_json(),
+            reps=[api_rep.to_json() for api_rep in api_reps] if api_reps else None,
+        ))
+
 @app.route('/reminder/unsubscribe')
 def reminder_unsubscribe():
     update_response = api_shortcuts.unsubscribe_from_reminder(

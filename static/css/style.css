@@ -331,6 +331,46 @@ h3.tips-title {
   margin-top: 25px;
 }
 
+.issue {
+  width: 850px;
+  max-width: calc(100% - 60px);
+  margin: auto;
+}
+
+.issue .title {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 36px;
+  line-height: 36px;
+}
+
+.issue .description {
+  margin-top: 20px;
+  white-space: pre-wrap;
+  max-width: 600px;
+  margin: auto;
+}
+
+.issue .creator-name {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: #777;
+  text-align: center;
+}
+
+.issue .contact-reps-cta,
+.issue .get-involved-cta  {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+.issue .social-icons {
+  max-width: 600px;
+  margin: auto;
+}
+
 .issue-form .headline {
   margin-top: 10px;
   text-align: center;
@@ -339,7 +379,7 @@ h3.tips-title {
 }
 
 .issue-form {
-  width: 500px;
+  width: 600px;
   max-width: calc(100% - 60px);
   margin: 0 auto 50px auto;
 }
@@ -348,6 +388,7 @@ h3.tips-title {
   text-align: center;
 }
 
+.issue .social-icon,
 .issue-form .social-icon {
   text-align: center;
 }
