@@ -331,7 +331,8 @@ h3.tips-title {
   text-align: center;
 }
 
-.compose-reminder-panel {
+.compose-reminder-panel,
+.compose-issue-cta-panel {
   margin-top: 25px;
 }
 
