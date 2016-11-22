@@ -130,7 +130,7 @@ a.search-toggle-link:hover {
 }
 
 .index-desc-container,
-.index-reminder-container {
+.index-issue-cta-container {
   background-color: #383D3B;
   color: #fff;
   text-align: center;
@@ -144,6 +144,10 @@ a.search-toggle-link:hover {
 }
 
 .index-how-it-works-container {
+  text-align: center;
+}
+
+.index-reminder-container {
   text-align: center;
 }
 
