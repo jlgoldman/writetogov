@@ -1,3 +1,5 @@
+import urllib2
+
 import apilib
 from flask import render_template
 
@@ -75,11 +77,18 @@ def _send_confirmation_email(email, frequency):
         frequency=frequency,
         unsubscribe_url=unsubscribe_url)
 
-    sendgrid_.send_message(
-        subject=subject,
-        body_text=text,
-        body_html=html,
-        recipients=[email])
+    retries = 3
+    while retries > 0:
+        try:
+            return sendgrid_.send_message(
+                subject=subject,
+                body_text=text,
+                body_html=html,
+                recipients=[email])
+        except urllib2.URLError:
+            retries -= 1
+            if retries == 0:
+                raise
 
 def _invalid_token_exception():
     error = apilib.ApiError(code='INVALID_TOKEN', path='token',
