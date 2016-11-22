@@ -64,6 +64,8 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         html = self._generate_html(req, db_rep)
         pdf_buffer = _create_pdf(html)
 
+        lob_address = self._create_lob_address(_normalize_textarea_input(req.name_and_address))
+
         api_rep = db_to_api.db_rep_to_api(db_rep)
         description = 'Letter to %s %s %s' % (
             api_rep.title, api_rep.first_name, api_rep.last_name)
@@ -80,7 +82,7 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
 
         lob_response = self._make_lob_request(
             pdf_buffer, api_rep, description,
-            _normalize_textarea_input(req.name_and_address))
+            lob_address['id'])
         db_rep_mailing.lob_letter_id = lob_response['id']
         db_rep_mailing.time_updated = time_.utcnow()
         db.session.commit()
@@ -132,12 +134,12 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
             app.logger.error('Stripe charge error: %s', e)
             raise _charge_error_exception('There was an error charging your card: %s' % e.message)
 
-    def _make_lob_request(self, pdf_buffer, api_rep, description, send_name_and_address):
+    def _make_lob_request(self, pdf_buffer, api_rep, description, lob_address_id):
         try:
             return lob.Letter.create(
               description=description,
               to_address=_api_rep_address_to_lob_address(api_rep),
-              from_address=_sender_name_and_address_to_lob_address(send_name_and_address),
+              from_address=lob_address_id,
               file=StringIO(pdf_buffer.getvalue()),
               address_placement='insert_blank_page',
               double_sided=True,
@@ -146,6 +148,14 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
             app.logger.error('Lob API error: %s', e)
             raise _lob_error_exception(
                 'There was an error submitting your letter to be mailed. Please contact info@writetogov.com.')
+
+    def _create_lob_address(self, name_and_address):
+        params = _sender_name_and_address_to_lob_address(name_and_address)
+        try:
+            return lob.Address.create(**params)
+        except lob.error.LobError as e:
+            app.logger.error('Lob address error: %s', e)
+            raise _lob_address_error_exception(e)
 
     def process_unhandled_exception(self, exception):
         # For debugging
@@ -172,6 +182,11 @@ def _charge_error_exception(message):
 def _lob_error_exception(message):
     error = apilib.ApiError(code='LETTER_ERROR', message=message)
     return apilib.ApiException.server_error([error])
+
+def _lob_address_error_exception(lob_error):
+    error = apilib.ApiError(code='ADDRESS_ERROR',
+        message='There was an error with your address: %s' % lob_error.message.replace('address_', ''))
+    return apilib.ApiException.request_error([error])
 
 def _create_pdf(pdf_data):
     if type(pdf_data) != unicode:

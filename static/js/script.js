@@ -255,9 +255,11 @@ function RepStripeFormCtrl($scope, $StripeCheckout, $stripePublishableKey, $lett
             $scope.onComplete({$response: response});
           }, function(response) {
             $scope.submitting = false;
-            console.log(response);
-            $scope.errors = response.data['errors'];
-          })
+            $scope.errors = response.data && response.data['errors'];
+            if (!$scope.errors || !$scope.errors.length) {
+              $scope.errors = [{'message': 'There was an error mailing your letter. Please try again or contact info@writetogov.com.'}];
+            }
+          });
       });
     }
   });

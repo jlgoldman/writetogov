@@ -42,20 +42,24 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
         self.assertIsNotNone(resp.pdf_content)
 
     @mock.patch.object(lob.Letter, 'create')
+    @mock.patch.object(lob.Address, 'create')
     @mock.patch.object(stripe.Charge, 'create')
-    def test_generate_and_mail_success(self, mock_charge_create, mock_letter_create):
+    def test_generate_and_mail_success(self, mock_charge_create, mock_address_create, mock_letter_create):
         req = letter.GenerateAndMailLetterRequest(
             stripe_token='stripe-token',
             email='foo@foo.com',
             rep_id=pelosi.rep_id,
             body='hello world',
             name_and_address='Bob Smith\r\n123 Main St\r\nSan Francisco, CA 94103')
+
+        mock_address_create.return_value = {'id': 'lob-address-id'}
         mock_charge_create.return_value = stripe.Charge(id='stripe-charge-id')
         mock_letter_create.return_value = {
             'id': 'lob-letter-id',
             'url': 'lob-url',
             'expected_delivery_date': '2016-11-12',
             }
+
         resp = self.service().invoke('generate_and_mail', req)
         self.assertEqual('SUCCESS', resp.response_code)
         self.assertEqual('November 12', resp.expected_delivery_date)
@@ -75,6 +79,7 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
         self.assertEqual('insert_blank_page', letter_kwargs['address_placement'])
         pdf_reader = PdfFileReader(letter_kwargs['file'])
         self.assertEqual(1, pdf_reader.getNumPages())
+        self.assertEqual('lob-address-id', letter_kwargs['from_address'])
         expected_to_address = {
             'name': u'Representative Nancy Pelosi',
             'address_line1': u'233 Longworth House Office Building',
@@ -84,15 +89,14 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
             'address_zip': u'20515',
             }
         self.assertDictEqual(expected_to_address, letter_kwargs['to_address'])
-        expected_from_address = {
-            'name': 'Bob Smith',
-            'address_line1': u'123 Main St',
-            'address_city': u'San Francisco',
-            'address_state': u'CA',
-            'address_zip': u'94103',
-            'address_country': 'US',
-            }
-        self.assertDictEqual(expected_from_address, letter_kwargs['from_address'])
+
+        mock_address_create.assert_called_once_with(
+            name='Bob Smith',
+            address_line1='123 Main St',
+            address_city='San Francisco',
+            address_state='CA',
+            address_zip='94103',
+            address_country='US')
 
         db_rm = RM.query.filter(RM.email == req.email).first()
         self.assertIsNotNone(db_rm)
@@ -105,17 +109,22 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
 
     @mock.patch('app.app.logger.error')
     @mock.patch.object(lob.Letter, 'create')
+    @mock.patch.object(lob.Address, 'create')
     @mock.patch.object(stripe.Charge, 'create')
-    def test_generate_and_mail_with_stripe_error(self, mock_charge_create, mock_letter_create, mock_log_error):
+    def test_generate_and_mail_with_stripe_error(self, mock_charge_create, mock_address_create,
+            mock_letter_create, mock_log_error):
         req = letter.GenerateAndMailLetterRequest(
             stripe_token='stripe-token',
             email='foo@foo.com',
             rep_id=pelosi.rep_id,
             body='hello world',
             name_and_address='Bob Smith\nSan Francisco, CA')
+
+        mock_address_create.return_value = {'id': 'lob-address-id'}
         mock_charge_create.side_effect = stripe.error.CardError(
             message='error message', param=None, code=None)
         mock_letter_create.return_value = None
+
         resp = self.service().invoke('generate_and_mail', req)
         self.assertEqual('REQUEST_ERROR', resp.response_code)
         self.assertEqual(1, len(resp.errors))
@@ -126,6 +135,7 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
             currency='usd',
             source='stripe-token',
             description='Letter to Representative Nancy Pelosi')
+        mock_address_create.assert_called_once()
         mock_letter_create.assert_not_called()
         mock_log_error.assert_called_once()
 
@@ -134,16 +144,53 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
 
     @mock.patch('app.app.logger.error')
     @mock.patch.object(lob.Letter, 'create')
+    @mock.patch.object(lob.Address, 'create')
     @mock.patch.object(stripe.Charge, 'create')
-    def test_generate_and_mail_with_lob_error(self, mock_charge_create, mock_letter_create, mock_log_error):
+    def test_generate_and_mail_with_lob_address_error(self, mock_charge_create, mock_address_create,
+            mock_letter_create, mock_log_error):
         req = letter.GenerateAndMailLetterRequest(
             stripe_token='stripe-token',
             email='foo@foo.com',
             rep_id=pelosi.rep_id,
             body='hello world',
             name_and_address='Bob Smith\nSan Francisco, CA')
+
+        mock_address_create.side_effect = lob.error.InvalidRequestError('address_line1 is required')
+        mock_charge_create.return_value = None
+        mock_letter_create.return_value = None
+
+        resp = self.service().invoke('generate_and_mail', req)
+        self.assertEqual('REQUEST_ERROR', resp.response_code)
+        self.assertEqual(1, len(resp.errors))
+        self.assertEqual(
+            'There was an error with your address: line1 is required',
+            resp.errors[0].message)
+
+        mock_address_create.assert_called_once()
+        mock_charge_create.assert_not_called()
+        mock_letter_create.assert_not_called()
+        mock_log_error.assert_called_once()
+
+        db_rm = RM.query.filter(RM.email == req.email).first()
+        self.assertIsNone(db_rm)
+
+    @mock.patch('app.app.logger.error')
+    @mock.patch.object(lob.Letter, 'create')
+    @mock.patch.object(lob.Address, 'create')
+    @mock.patch.object(stripe.Charge, 'create')
+    def test_generate_and_mail_with_lob_mail_error(self, mock_charge_create, mock_address_create,
+            mock_letter_create, mock_log_error):
+        req = letter.GenerateAndMailLetterRequest(
+            stripe_token='stripe-token',
+            email='foo@foo.com',
+            rep_id=pelosi.rep_id,
+            body='hello world',
+            name_and_address='Bob Smith\nSan Francisco, CA')
+
+        mock_address_create.return_value = {'id': 'lob-address-id'}
         mock_charge_create.return_value = stripe.Charge(id='stripe-charge-id')
         mock_letter_create.side_effect = lob.error.LobError('test error')
+
         resp = self.service().invoke('generate_and_mail', req)
         self.assertEqual('SERVER_ERROR', resp.response_code)
         self.assertEqual(1, len(resp.errors))
@@ -151,6 +198,7 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
             'There was an error submitting your letter to be mailed. Please contact info@writetogov.com.',
             resp.errors[0].message)
 
+        mock_address_create.assert_called_once()
         mock_charge_create.assert_called_once()
         mock_letter_create.assert_called_once()
         mock_log_error.assert_called_once()
