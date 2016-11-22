@@ -295,7 +295,7 @@
               <textarea ng-model="form.nameAndAddress" style="display:none" name="name_and_address"></textarea>
               <input type="text" style="display:none" name="include_address_page" value="1"/>
               <md-button class="md-raised md-primary" type="submit"
-                ng-click="state.composeComplete = true"
+                ng-click="pdfDownloaded()"
                 ng-disabled="!isFormComplete()">
                 Generate PDF to Print
               </md-button>
@@ -305,7 +305,7 @@
             </md-button>
           </div>
 
-          <div class="mail-form-panel" ng-if="state.mailFormOpen">
+          <div class="mail-form-panel" ng-if="state.mailFormOpen" ng-controller="MailFormCtrl">
             <div class="return-to-letter">
               <a href="javascript:void(0)" ng-click="state.mailFormOpen = false">
                 <i class="material-icons">keyboard_arrow_down</i>
@@ -335,10 +335,37 @@
               Then simply enter billing information and confirm:
             </p>
             <rep-stripe-form rep="rep" body="form.body" name-and-address="form.nameAndAddress"
-              button-text="Enter Billing Info">
+              button-text="Enter Billing Info"
+              on-complete="mailSendComplete($response)">
             </rep-stripe-form>
+
+            <div class="address-preview">
+              <p>
+                Letters can only be sent from valid US addresses. From the letter above
+                we've parsed your address as the following:
+              </p>
+              <md-progress-circular md-mode="indeterminate" ng-show="loadingAddress" class="center-progress">
+              </md-progress-circular>
+              <div ng-if="parsedAddress">
+                <div><label>Name:</label> [[parsedAddress['name'] ]]</div>
+                <div><label>Address:</label> [[parsedAddress['line1'] ]]</div>
+                <div><label>City:</label> [[parsedAddress['city'] ]]</div>
+                <div><label>State:</label> [[parsedAddress['state'] ]]</div>
+                <div><label>ZIP:</label> [[parsedAddress['zip'] ]]</div>
+              </div>
+              <p>
+                If this is incorrect please
+                <a href="javascript:void(0)" ng-click="state.mailFormOpen = false" md-colors="{color:'primary'}">
+                  return to the letter
+                </a>
+                and correct your address.
+              </p>
+            </div>
+
             <p class="fees">
-              Our letter-mailing service lob.com charges $0.95 per letter + $0.10 per extra page. Our payment processor Stripe charges $0.30 + 2.9% per transaction. The extra ~$0.20 is used to cover the cost of operating our servers.
+              Our letter-mailing service lob.com charges $1.05 per letter
+              (including an address page) + $0.10 per extra page.
+              Our payment processor Stripe charges $0.30 + 2.9% per transaction. The extra ~$0.10 is used to cover the cost of operating our servers.
               We will work to negotiate lower mailing and transaction fees over time.
             </p>
           </div>
@@ -351,10 +378,10 @@
               </a>
             </div>
 
-            <p md-colors="{color:'primary'}" class="center-text">
+            <p md-colors="{color:'primary'}" class="center-text md-headline">
               Thank you for being an involved citizen!
             </p>
-            <p>
+            <p ng-if="state.completionType == CompletionType.PRINT">
               The PDF of your letter includes an optional address page that is
               pre-filled with the mailing address of your representative as well
               as your return address if you provided one above, so that you
@@ -362,9 +389,16 @@
               Print your letter (double-sided if your printer supports it),
               then simply put the address page on the outside, fold it up in thirds, staple the top, add a stamp, and you're good to go!
             </p>
+            <p ng-if="state.completionType == CompletionType.MAIL">
+              Your letter has been successfully queued for sending, and is expected to arrive on [[mailSendResponse['expected_delivery_date'] ]].
+              You can view the letter as it will be mailed
+              <a ng-href="[[mailSendResponse['lob_pdf_url'] ]]" target="_blank"
+                md-colors="{color:'primary'}">
+                here</a>.
+            </p>
 
             <div class="compose-reminder-panel">
-              <div md-colors="{color:'primary'}" class="center-text">
+              <div md-colors="{color:'primary'}" class="center-text md-title">
                 Maximize your impact by staying involved
               </div>
               <div class="center-text">

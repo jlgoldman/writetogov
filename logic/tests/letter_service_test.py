@@ -164,6 +164,17 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
         self.assertIsNotNone(db_rm.time_updated)
         self.assertEqual(db_rm.time_updated, db_rm.time_created)
 
+    def test_parse_address_request(self):
+        req = letter.ParseAddressRequest(
+            name_and_address='Bob Smith\n123 Main St\nSan Francisco, CA 94103')
+        resp = self.service().invoke('parse_address', req)
+        self.assertEqual('SUCCESS', resp.response_code)
+        self.assertEqual('Bob Smith', resp.name)
+        self.assertEqual('123 Main St', resp.line1)
+        self.assertEqual('San Francisco', resp.city)
+        self.assertEqual('CA', resp.state)
+        self.assertEqual('94103', resp.zip)
+
 class SenderAddressParsingTest(unittest.TestCase):
     def parse(self, lines):
         addr_string = '\r\n'.join(lines)

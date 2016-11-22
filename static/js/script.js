@@ -151,11 +151,17 @@ function ReminderCtrl($scope, $reminderService) {
   };
 }
 
+var CompletionType = {
+  PRINT: 1,
+  MAIL: 2
+};
+
 function ComposeCtrl($scope, $repService, $routeParams, $preloadData, $document) {
   $scope.state = {
     loading: false,
     mailFormOpen: false,
-    composeComplete: false
+    composeComplete: false,
+    completionType: null
   };
   $scope.form = {
     repId: $routeParams.repId,
@@ -164,6 +170,8 @@ function ComposeCtrl($scope, $repService, $routeParams, $preloadData, $document)
   };
   $scope.currentDate = new Date();
   $scope.rep = $preloadData.rep || null;
+  $scope.CompletionType = CompletionType;
+  $scope.mailSendResponse = null;
 
   this.init = function() {
     if ($scope.rep) {
@@ -191,10 +199,38 @@ function ComposeCtrl($scope, $repService, $routeParams, $preloadData, $document)
       && $scope.form.nameAndAddress && $scope.form.nameAndAddress.trim();
   };
 
+  $scope.pdfDownloaded = function() {
+    $scope.state.composeComplete = true;
+    $scope.state.completionType = CompletionType.PRINT;
+  };
+
   $scope.openMailForm = function() {
     $scope.state.mailFormOpen = true;
     // HACK: Make sure we scroll to the top of the page so the form is properly visble;
     $document[0].body.scrollTop = 0;
+  };
+
+  $scope.mailSendComplete = function(response) {
+    $scope.state.mailFormOpen = false;
+    $scope.state.composeComplete = true;
+    $scope.state.completionType = CompletionType.MAIL;
+    $scope.mailSendResponse = response.data;
+  };
+
+  this.init();
+}
+
+function MailFormCtrl($scope, $letterService) {
+  $scope.loadingAddress = false;
+  $scope.parsedAddress = null;
+
+  this.init = function() {
+    $scope.loadingAddress = true;
+    $letterService.parseAddress($scope.form.nameAndAddress)
+      .then(function(response) {
+        $scope.loadingAddress = false;
+        $scope.parsedAddress = response.data;
+      });
   };
 
   this.init();
@@ -216,6 +252,7 @@ function RepStripeFormCtrl($scope, $StripeCheckout, $stripePublishableKey, $lett
             $scope.rep['rep_id'], $scope.body, $scope.nameAndAddress)
           .then(function(response) {
             $scope.submitting = false;
+            $scope.onComplete({$response: response});
           }, function(response) {
             $scope.submitting = false;
             console.log(response);
@@ -248,6 +285,7 @@ function repStripeForm() {
       body: '=',
       nameAndAddress: '=',
       buttonText: '@',
+      onComplete: '&'
     },
     templateUrl: 'rep-stripe-form-template',
     controller: RepStripeFormCtrl
@@ -397,6 +435,13 @@ function LetterService($http) {
     };
     return $http.post('/letter_service/generate_and_mail', req);
   };
+
+  this.parseAddress = function(nameAndAddress) {
+    var req = {
+      'name_and_address': nameAndAddress
+    };
+    return $http.post('/letter_service/parse_address', req);
+  };
 }
 
 function PageTransitioner($document, $location, $preloadData) {
@@ -443,6 +488,7 @@ function initMain(clientConfig) {
     .controller('DistrictCtrl', DistrictCtrl)
     .controller('ReminderCtrl', ReminderCtrl)
     .controller('ComposeCtrl', ComposeCtrl)
+    .controller('MailFormCtrl', MailFormCtrl)
     .service('$repService', RepService)
     .service('$reminderService', ReminderService)
     .service('$letterService', LetterService)

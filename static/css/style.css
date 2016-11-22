@@ -287,6 +287,10 @@ h3.tips-title {
   text-align: center;
 }
 
+.compose-container .mail-form-panel .address-preview label {
+  font-weight: 500;
+}
+
 .compose-container .mail-form-panel .fees {
   margin-top: 20px;
   font-size: 11px;
@@ -324,7 +328,7 @@ h3.tips-title {
 }
 
 .compose-reminder-panel {
-  margin-top: 10px;
+  margin-top: 25px;
 }
 
 .footer {

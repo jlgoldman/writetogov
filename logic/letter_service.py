@@ -89,6 +89,15 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
                 lob_response['expected_delivery_date']).strftime('%B %-d'),
             lob_pdf_url=lob_response['url'])
 
+    def parse_address(self, req):
+        lob_address = _sender_name_and_address_to_lob_address(req.name_and_address)
+        return letter.ParseAddressResponse(
+            name=lob_address.get('name'),
+            line1=lob_address.get('address_line1'),
+            city=lob_address.get('address_city'),
+            state=lob_address.get('address_state'),
+            zip=lob_address.get('address_zip'))
+
     def _generate_html(self, req, db_rep=None):
         db_rep = db_rep or R.query.get(req.rep_id)
         if not db_rep:
@@ -207,7 +216,7 @@ def _sender_name_and_address_to_lob_address(name_and_address):
         if part_type == 'PlaceName':
             place_name_parts.append(part.rstrip(','))
         elif part_type == 'StateName' and not state:
-            state = part
+            state = part.rstrip(',')
         elif part_type == 'ZipCode':
             zipcode = part
         elif part_type == 'ZipPlus4' and zipcode and len(zipcode) == 5:
