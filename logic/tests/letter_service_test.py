@@ -49,7 +49,7 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
             email='foo@foo.com',
             rep_id=pelosi.rep_id,
             body='hello world',
-            name_and_address='Bob Smith\nSan Francisco, CA')
+            name_and_address='Bob Smith\r\n123 Main St\r\nSan Francisco, CA 94103')
         mock_charge_create.return_value = stripe.Charge(id='stripe-charge-id')
         mock_letter_create.return_value = {
             'id': 'lob-letter-id',
@@ -75,8 +75,24 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
         self.assertEqual('insert_blank_page', letter_kwargs['address_placement'])
         pdf_reader = PdfFileReader(letter_kwargs['file'])
         self.assertEqual(1, pdf_reader.getNumPages())
-        self.assertIsNotNone(letter_kwargs['to_address'])
-        self.assertIsNotNone(letter_kwargs['from_address'])
+        expected_to_address = {
+            'name': u'Representative Nancy Pelosi',
+            'address_line1': u'233 Longworth House Office Building',
+            'address_city': 'Washington',
+            'address_state': 'DC',
+            'address_country': 'US',
+            'address_zip': u'20515',
+            }
+        self.assertDictEqual(expected_to_address, letter_kwargs['to_address'])
+        expected_from_address = {
+            'name': 'Bob Smith',
+            'address_line1': u'123 Main St',
+            'address_city': u'San Francisco',
+            'address_state': u'CA',
+            'address_zip': u'94103',
+            'address_country': 'US',
+            }
+        self.assertDictEqual(expected_from_address, letter_kwargs['from_address'])
 
         db_rm = RM.query.filter(RM.email == req.email).first()
         self.assertIsNotNone(db_rm)
@@ -147,6 +163,57 @@ class LetterServiceTest(test_base.DatabaseWithTestdataTest):
         self.assertIsNotNone(db_rm.time_created)
         self.assertIsNotNone(db_rm.time_updated)
         self.assertEqual(db_rm.time_updated, db_rm.time_created)
+
+class SenderAddressParsingTest(unittest.TestCase):
+    def parse(self, lines):
+        addr_string = '\r\n'.join(lines)
+        return letter_service._sender_name_and_address_to_lob_address(addr_string)
+
+    def test_basic_addr(self):
+        lob_addr = self.parse([
+            'Bob Smith',
+            '123 Main',
+            'Frankfort, KY 12345',
+            ])
+        self.assertEqual('Bob Smith', lob_addr['name'])
+        self.assertEqual('123 Main', lob_addr['address_line1'])
+        self.assertEqual('Frankfort', lob_addr['address_city'])
+        self.assertEqual('KY', lob_addr['address_state'])
+        self.assertEqual('12345', lob_addr['address_zip'])
+        self.assertEqual('US', lob_addr['address_country'])
+
+    def test_zip4(self):
+        lob_addr = self.parse([
+            'Bob Smith',
+            '123 Main',
+            'Frankfort, KY 12345-9876',
+            ])
+        self.assertEqual('Bob Smith', lob_addr['name'])
+        self.assertEqual('123 Main', lob_addr['address_line1'])
+        self.assertEqual('Frankfort', lob_addr['address_city'])
+        self.assertEqual('KY', lob_addr['address_state'])
+        self.assertEqual('12345-9876', lob_addr['address_zip'])
+        self.assertEqual('US', lob_addr['address_country'])
+
+        lob_addr = self.parse([
+            'Bob Smith',
+            '123 Main',
+            'Frankfort, KY 12345 - 9876',
+            ])
+        self.assertEqual('12345-9876', lob_addr['address_zip'])
+
+    def test_long_state_name(self):
+        lob_addr = self.parse([
+            'Bob Smith',
+            '123 Main',
+            'Frankfort, kentucky 12345',
+            ])
+        self.assertEqual('Bob Smith', lob_addr['name'])
+        self.assertEqual('123 Main', lob_addr['address_line1'])
+        self.assertEqual('Frankfort', lob_addr['address_city'])
+        self.assertEqual('KY', lob_addr['address_state'])
+        self.assertEqual('12345', lob_addr['address_zip'])
+        self.assertEqual('US', lob_addr['address_country'])
 
 if __name__ == '__main__':
     unittest.main()

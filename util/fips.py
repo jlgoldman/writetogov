@@ -8,9 +8,16 @@ def get_by_fips_code(fips_code):
 def get_by_state_code(state_code):
     return INFOS_BY_STATE_CODE.get(state_code)
 
+def get_by_state_name(state_name):
+     return INFOS_BY_STATE_NAME.get(state_name.strip().title())
+
 def get_state_name_for_code(state_code):
     fips_info = get_by_state_code(state_code)
     return fips_info.name if fips_info else None
+
+def get_state_code_for_name(state_name):
+    fips_info = get_by_state_name(state_name)
+    return fips_info.state_code if fips_info else None
 
 FIPS_INFOS = map(lambda t: FIPSInfo(*t), (
     ('Alabama',                    '01', 'AL'),
@@ -72,7 +79,8 @@ FIPS_INFOS = map(lambda t: FIPSInfo(*t), (
     ('Virgin Islands of the U.S.', '78', 'VI'),
 ))
 
-INFOS_BY_FIPS_CODE = {t[1]: t for t in FIPS_INFOS}
+INFOS_BY_STATE_NAME = {t[0]: t for t in FIPS_INFOS}
+INFOS_BY_FIPS_CODE  = {t[1]: t for t in FIPS_INFOS}
 INFOS_BY_STATE_CODE = {t[2]: t for t in FIPS_INFOS}
 
 ONE_DISTRICT_STATE_CODES = set([

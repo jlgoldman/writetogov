@@ -13,6 +13,7 @@ Flask==0.11.1
 Flask-SQLAlchemy==2.1
 Flask-Testing==0.6.1
 funcsigs==1.0.2
+future==0.16.0
 GeoAlchemy2==0.3.0
 gnureadline==6.3.3
 html5lib==1.0b8
@@ -25,6 +26,7 @@ Jinja2==2.8
 lob==2.26
 lxml==3.6.4
 MarkupSafe==0.23
+Metafone==0.5
 mock==2.0.0
 ndg-httpsclient==0.4.2
 path.py==8.2.1
@@ -33,6 +35,7 @@ pbr==1.10.0
 pexpect==4.2.1
 pickleshare==0.7.4
 Pillow==3.4.2
+probableparsing==0.0.1
 prompt-toolkit==1.0.9
 psycopg2==2.6.2
 ptyprocess==0.5.1
@@ -43,6 +46,7 @@ pyflakes==1.3.0
 Pygments==2.1.3
 pyOpenSSL==16.2.0
 PyPDF2==1.26.0
+python-crfsuite==0.8.4
 python-dateutil==2.6.0
 python-http-client==2.2.1
 reportlab==3.3.0
@@ -54,6 +58,7 @@ SQLAlchemy==1.1.3
 stripe==1.41.1
 traitlets==4.3.1
 urllib3==1.19
+usaddress==0.5.7
 wcwidth==0.1.7
 webencodings==0.5
 Werkzeug==0.11.11

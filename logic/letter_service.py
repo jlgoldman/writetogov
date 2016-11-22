@@ -9,6 +9,7 @@ import flask
 import lob
 from PyPDF2 import PdfFileMerger
 import stripe
+import usaddress
 from xhtml2pdf import pisa
 
 from api import letter
@@ -17,6 +18,7 @@ from config import constants
 from database import db
 from database import db_models
 from logic import db_to_api
+from util import fips
 from util import time_
 
 stripe.api_key = constants.STRIPE_SECRET_KEY
@@ -27,6 +29,8 @@ R = db_models.Rep
 TZ_EASTERN = tz.gettz('America/New_York')
 PHONE_RE = re.compile('(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})')
 EMAIL_RE = re.compile(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)')
+ZIP4_LINE_RE = re.compile('\d{5}-\d{4}')
+ADDRESS_DC_PARSE_RE = re.compile('(\d+\w?)\s+(.+)\s+Washington,?\s+DC,?\s+(\d+)')
 
 # xhtml2pdf logs errors like
 # "missing explicit frame definition for content or just static frames"
@@ -74,7 +78,8 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
         db.session.add(db_rep_mailing)
         db.session.commit()
 
-        lob_response = self._make_lob_request(pdf_buffer, description)
+        lob_response = self._make_lob_request(
+            pdf_buffer, api_rep, description, req.name_and_address)
         db_rep_mailing.lob_letter_id = lob_response['id']
         db_rep_mailing.time_updated = time_.utcnow()
         db.session.commit()
@@ -115,26 +120,12 @@ class LetterServiceImpl(letter.LetterService, apilib.ServiceImplementation):
             app.logger.error('Stripe charge error: %s', e)
             raise _charge_error_exception('There was an error charging your card: %s' % e.message)
 
-    def _make_lob_request(self, pdf_buffer, description):
+    def _make_lob_request(self, pdf_buffer, api_rep, description, send_name_and_address):
         try:
             return lob.Letter.create(
               description=description,
-              to_address={
-                  'name': 'Harry Zhang',
-                  'address_line1': '123 Test Street',
-                  'address_city': 'Mountain View',
-                  'address_state': 'CA',
-                  'address_zip': '94041',
-                  'address_country': 'US'
-              },
-              from_address={
-                  'name': 'Harry Zhang',
-                  'address_line1': '123 Test Avenue',
-                  'address_city': 'Seattle',
-                  'address_state': 'WA',
-                  'address_zip': '94041',
-                  'address_country': 'US'
-              },
+              to_address=_api_rep_address_to_lob_address(api_rep),
+              from_address=_sender_name_and_address_to_lob_address(send_name_and_address),
               file=StringIO(pdf_buffer.getvalue()),
               address_placement='insert_blank_page',
               double_sided=True,
@@ -186,10 +177,53 @@ def _date_str():
 
 def _make_sender_address(name_and_address):
     lines = []
-    for line in name_and_address.split('\r\n'):
-        if line and not PHONE_RE.search(line) and not EMAIL_RE.search(line):
+    delimiter = '\r\n' if '\r\n' in name_and_address else '\n'
+    for line in name_and_address.split(delimiter):
+        is_phone_line = PHONE_RE.search(line) and not ZIP4_LINE_RE.search(line)
+        if line and not is_phone_line and not EMAIL_RE.search(line):
             lines.append(line)
     return '\r\n'.join(lines)
+
+def _api_rep_address_to_lob_address(api_rep):
+    match = ADDRESS_DC_PARSE_RE.match(api_rep.address_dc)
+    return {
+      'name': '%s %s %s' % (api_rep.title, api_rep.first_name, api_rep.last_name),
+      'address_line1': '%s %s' % (match.group(1), match.group(2)),
+      'address_city': 'Washington',
+      'address_state': 'DC',
+      'address_zip': match.group(3),
+      'address_country': 'US',
+    }
+
+def _sender_name_and_address_to_lob_address(name_and_address):
+    # Remove phone and email
+    lines = _make_sender_address(name_and_address).split('\r\n')
+    parsed = usaddress.parse(', '.join(lines[1:]))
+    line1_parts = []
+    place_name_parts = []
+    state = None
+    zipcode = None
+    for part, part_type in parsed:
+        if part_type == 'PlaceName':
+            place_name_parts.append(part.rstrip(','))
+        elif part_type == 'StateName' and not state:
+            state = part
+        elif part_type == 'ZipCode':
+            zipcode = part
+        elif part_type == 'ZipPlus4' and zipcode and len(zipcode) == 5:
+            zipcode = '%s-%s' % (zipcode, part)
+        else:
+            line1_parts.append(part.rstrip(','))
+    if state and len(state) > 2:
+        state = fips.get_state_code_for_name(state)
+    return {
+        'name': lines[0] if lines else None,
+        'address_line1': ' '.join(line1_parts),
+        'address_city': ' '.join(place_name_parts),
+        'address_state': state.upper() if state else None,
+        'address_zip': zipcode,
+        'address_country': 'US',
+    }
 
 # xhtml2pdf supports css white-space but not pre-line or pre-wrap,
 # seemingly only pre. So we have to roll our own pre-line to get
