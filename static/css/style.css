@@ -350,10 +350,9 @@ h3.tips-title {
 }
 
 .issue .description {
-  margin-top: 20px;
   white-space: pre-wrap;
   max-width: 600px;
-  margin: auto;
+  margin: 20px auto 0 auto;
 }
 
 .issue .creator-name {
