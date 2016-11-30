@@ -67,7 +67,7 @@ class ReminderServiceImpl(reminder.ReminderService, apilib.ServiceImplementation
 
 def _send_confirmation_email(email, frequency):
     unsubscribe_url = reminder_logic.generate_unsubscribe_url(email)
-    subject = 'Confirmation of periodic reminders'
+    subject = 'Reminder confirmation'
 
     html = render_template('email/reminder_confirmation.html',
         subject=subject,
