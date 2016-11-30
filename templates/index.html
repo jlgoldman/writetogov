@@ -65,6 +65,7 @@
             <input type="text" ng-model="form.address"
               class="address-input" placeholder="Address"
               google-place-autocomplete on-select="placeSelected($place)"
+              focus-on="state.searchBoxNeedsFocus"
               autofocus/>
           </div>
 
@@ -84,6 +85,7 @@
             md-items="item in textSearch(form.searchText)"
             md-item-text="item.name"
             md-min-length="0"
+            focus-child-input-on="state.searchBoxNeedsFocus"
             placeholder="e.g. 'nancy pelosi', 'california', 'ca 12th'">
             <md-item-template>
               <span md-highlight-text="form.searchText" md-highlight-flags="i">
@@ -112,6 +114,20 @@
         <p>
           This tool aims to make contacting your representatives as fast and easy
           as possible. It only takes a few minutes; write now and write often.
+        </p>
+        <div class="headline center-text">
+          Why Write vs Call or Email?
+        </div>
+        <p>
+          There's really only two ways to get the attention of your representatives: call them,
+          or write a physical letter.
+        </p>
+        <p>
+          Staffers say that emails and social media posts are largely ignored.
+          We encourage you to call your representatives,
+          and provide convenient one-click call links on every page. But if you want to compose your
+          thoughts clearly, are having trouble getting through on the phone, or don't have time
+          during business hours to make a class, you should write and mail a letter.
         </p>
       </div>
     </div>

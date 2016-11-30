@@ -34,7 +34,7 @@ function IndexCtrl($scope, $repService, $location,
   $scope.state = {
     loading: false,
     searchMode: SearchMode.ADDRESS,
-    searchBoxFocused: false
+    searchBoxNeedsFocus: false
   };
   $scope.SearchMode = SearchMode;
 
@@ -52,7 +52,7 @@ function IndexCtrl($scope, $repService, $location,
 
   $scope.setSearchMode = function(searchMode) {
     $scope.state.searchMode = searchMode;
-    $scope.state.searchBoxFocused = true;
+    $scope.state.searchBoxNeedsFocus = true;
   };
 
   $scope.$watch('form.selectedSearchItem', function(item, oldItem) {
@@ -586,6 +586,46 @@ function googlePlaceAutocomplete($parse) {
   };
 }
 
+function focusOn($parse, $timeout) {
+  return {
+    link: function (scope, element, attrs) {
+      var model = $parse(attrs.focusOn);
+      scope.$watch(model, function(value) {
+        console.log(value);
+        if (value) {
+          $timeout(function () {
+            element[0].focus();
+          });
+        }
+      });
+      element.on('blur', function () {
+        scope.$apply(model.assign(scope, false));
+      });
+    }
+  };
+}
+
+function focusChildInputOn($parse, $timeout) {
+  return {
+    link: function (scope, element, attrs) {
+      var model = $parse(attrs.focusChildInputOn);
+      $timeout(function() {
+        var input = element.find('input');
+        scope.$watch(model, function(value) {
+          if (value) {
+            $timeout(function () {
+              input[0].focus();
+            });
+          }
+        });
+        input.on('blur', function () {
+          scope.$apply(model.assign(scope, false));
+        });
+      });
+    }
+  };
+}
+
 function RepService($http) {
   this.getByRepId = function(repId) {
     var req = {
@@ -731,6 +771,8 @@ function initMain(clientConfig) {
     .directive('repCard', repCard)
     .directive('googlePlaceAutocomplete', googlePlaceAutocomplete)
     .directive('repStripeForm', repStripeForm)
+    .directive('focusOn', focusOn)
+    .directive('focusChildInputOn', focusChildInputOn)
     .value('$repResults', new RepResults())
     .value('$repAutocompleteData', clientConfig['rep_autocomplete_data'])
     .value('$preloadData', new PreloadData(clientConfig['rep'], clientConfig['lookup_response']))
