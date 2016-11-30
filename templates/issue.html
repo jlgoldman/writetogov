@@ -33,11 +33,13 @@
 
 <script type="text/ng-template" id="issue-template">
   <div ng-controller="IssueCtrl" class="issue">
-    <div class="title">[[issue['title'] ]]</div>
-    <div ng-if="issue['creator_name']" class="creator-name">
-      Created by [[issue['creator_name'] ]]
+    <div class="issue-body">
+      <div class="title">[[issue['title'] ]]</div>
+      <div ng-if="issue['creator_name']" class="creator-name">
+        Created by [[issue['creator_name'] ]]
+      </div>
+      <div class="description">[[issue['description'] ]]</div>
     </div>
-    <div class="description">[[issue['description'] ]]</div>
 
     <div ng-if="!reps">
       <div class="contact-reps-cta">

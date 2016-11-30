@@ -342,6 +342,11 @@ h3.tips-title {
   margin: auto;
 }
 
+.issue .issue-body {
+  max-width: 600px;
+  margin: auto;
+}
+
 .issue .title {
   margin-top: 10px;
   text-align: center;
@@ -351,7 +356,6 @@ h3.tips-title {
 
 .issue .description {
   white-space: pre-wrap;
-  max-width: 600px;
   margin: 20px auto 0 auto;
 }
 
