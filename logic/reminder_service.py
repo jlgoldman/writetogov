@@ -77,7 +77,7 @@ def _send_confirmation_email(email, frequency):
         frequency=frequency,
         unsubscribe_url=unsubscribe_url)
 
-    retries = 3
+    retries = 8
     while retries > 0:
         try:
             return sendgrid_.send_message(
