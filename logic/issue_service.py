@@ -115,7 +115,7 @@ def _db_issue_to_api(db_issue):
 def _verify_issue_token(token, email, issue_id):
     email = email.strip().lower()
     try:
-        msg = crypto.decrypt_with_salt(token)
+        msg = crypto.decrypt(token)
     except:
         return False
     parts = msg.split('|||')
@@ -128,7 +128,7 @@ def _generate_issue_token(email, issue_id):
     # just in case it's needed in the future.
     timestamp = time_.current_timestamp()
     msg = '%s|||%d|||%d' % (email, issue_id, timestamp)
-    return crypto.encrypt_with_salt(msg)
+    return crypto.encrypt(msg)
 
 def _make_edit_url(email, issue_id):
     token = _generate_issue_token(email, issue_id)

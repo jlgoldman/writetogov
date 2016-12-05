@@ -12,7 +12,7 @@ def generate_unsubscribe_url(email):
 def verify_email_token(token, email):
     email = email.strip().lower()
     try:
-        msg = crypto.decrypt_with_salt(token)
+        msg = crypto.decrypt(token)
     except:
         return False
     parts = msg.split('|||')
@@ -24,4 +24,4 @@ def generate_email_token(email):
     email = email.strip().lower()
     timestamp = time_.current_timestamp()
     msg = '%s|||%d' % (email, timestamp)
-    return crypto.encrypt_with_salt(msg)
+    return crypto.encrypt(msg)
