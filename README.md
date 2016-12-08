@@ -47,11 +47,12 @@ Install [PostreSQL](https://wiki.postgresql.org/wiki/Detailed_installation_guide
 
 Install [PostGIS](http://postgis.net/install/). PostGIS is the geospatial extension for PostgreSQL;
 writetogov stores polygons for Congressional districts using PostGIS Geography column types, and
-looks up a user's Congressional district from the latlng return by Google Maps from their address,
+looks up a user's Congressional district from the latlng returned by Google Maps from their address,
 using a spatial query.
 
 Create a database called `writetogov`. If using a different name or a non-local database,
-override `SQLALCHEMY_DATABASE_URI` in `constants_override.py`.
+override `SQLALCHEMY_DATABASE_URI` in `constants_override.py` with the name and location
+of your database.
 
 ```bash
 createdb writetogov
@@ -72,4 +73,4 @@ psql -d writetogov -f writetogov.20161207.sql
 python main.py
 ```
 
-This runs a debug server on port 5000; then just go to http://localhost:5000.
+This runs a debug server on port 5000; then just go to [http://localhost:5000](http://localhost:5000).
