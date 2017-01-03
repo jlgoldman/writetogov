@@ -102,7 +102,7 @@ class Reminder(db.Model):
 
 class RepMailing(db.Model):
     rep_mailing_id = db.Column(db.BigInteger, primary_key=True)
-    rep_id = db.Column(db.Integer, db.ForeignKey('rep.rep_id'), index=True)
+    rep_id = db.Column(db.Integer, index=True)
     email = db.Column(db.String(100), index=True)
     stripe_charge_id = db.Column(db.String(50), index=True)
     lob_letter_id = db.Column(db.String(50), index=True)
