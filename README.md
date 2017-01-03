@@ -60,11 +60,11 @@ createdb writetogov
 
 Import the latest database snapshot, which contains data for Congressional districts and representatives,
 as well as empty tables for `issue`, `reminder`, etc. Find the latest snapshot in the `data/` directory,
-at this writing `writetogov.20161207.sql.zip`.
+at this writing `writetogov.20170103.sql.zip`.
 
 ```bash
-unzip data/writetogov.20161207.sql.zip
-psql -d writetogov -f writetogov.20161207.sql
+unzip data/writetogov.20170103.sql.zip
+psql -d writetogov -f writetogov.20170103.sql
 ```
 
 ### Running
