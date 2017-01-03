@@ -1,0 +1,8 @@
+Rought steps for populating the database with new representatives after an election and new congressional term begins.
+
+-Run database/populate_reps.py to pull in new reps from the XML feeds and delete old ones.
+-Run database/fix_rep_addresses.py to standardize the formatting of DC office addresses.
+-Try to find rep photos. They may not be populated in the Congressional Bioguide yet, so it may not be possible to do this right after the new term begins.
+-Run tools/make_rep_social_images.py.
+-Run database/generate_rep_autocomplete.py to spit out new autocomplete data file.
+-Run tools/generate_sitemap.py.

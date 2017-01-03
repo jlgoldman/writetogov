@@ -74,7 +74,7 @@
       </md-card-title-text>
       <md-card-title-media>
         <div class="md-media-md card-media rep-photo-wrapper">
-          <img ng-src="[[rep['photo_url'] ]]" class="rep-photo"/>
+          <img ng-src="[[rep['photo_url'] ]]" class="rep-photo" onerror="if (this.src != '/static/img/no-photo.png') this.src = '/static/img/no-photo.png'"/>
         </div>
       </md-card-title-media>
     </md-card-title>

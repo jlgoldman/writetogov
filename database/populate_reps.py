@@ -25,8 +25,20 @@ def populate_senators():
             website=get_field(member, 'website'),
             address_dc=get_field(member, 'address'),
             phone_dc=get_field(member, 'phone'),
-            bioguide_id=get_field(member, 'bioguide_id'))
-        db.session.add(db_rep)
+            bioguide_id=get_field(member, 'bioguide_id'),
+            status=db_models.Rep.Status.ACTIVE)
+        existing_db_rep = db_models.Rep.query.filter(db_models.Rep.bioguide_id == db_rep.bioguide_id).first()
+        if not existing_db_rep:
+            rep_to_delete = db_models.Rep.query \
+                .filter(db_models.Rep.state_code == db_rep.state_code) \
+                .filter(db_models.Rep.chamber == db_models.Rep.Chamber.SENATE) \
+                .filter(db_models.Rep.status != db_models.Rep.Status.ACTIVE) \
+                .one()
+            db.session.delete(rep_to_delete)
+            db.session.add(db_rep)
+            print 'Deleting senator (%s) with status "%s": %s %s' % (rep_to_delete.state_code, rep_to_delete.status,
+                rep_to_delete.first_name, rep_to_delete.last_name)
+            print 'Adding new senator (%s): %s %s' % (db_rep.state_code, db_rep.first_name, db_rep.last_name)
 
 def populate_house_reps():
     resp = requests.get('http://clerk.house.gov/xml/lists/MemberData.xml')
@@ -47,8 +59,16 @@ def populate_house_reps():
             website=None,
             address_dc=address,
             phone_dc=get_field(member_info, 'phone'),
-            bioguide_id=get_field(member_info, 'bioguideID'))
-        db.session.add(db_rep)
+            bioguide_id=get_field(member_info, 'bioguideID'),
+            status=db_models.Rep.Status.ACTIVE)
+        existing_db_rep = db_models.Rep.query.filter(db_models.Rep.bioguide_id == db_rep.bioguide_id).first()
+        if not existing_db_rep:
+            rep_to_delete = db_models.Rep.query.filter(db_models.Rep.district_code == district_code).one()
+            db.session.delete(rep_to_delete)
+            db.session.add(db_rep)
+            print 'Deleting representative (%s) with status "%s": %s %s' % (rep_to_delete.district_code, rep_to_delete.status,
+                rep_to_delete.first_name, rep_to_delete.last_name)
+            print 'Adding new representative (%s): %s %s' % (db_rep.district_code, db_rep.first_name, db_rep.last_name)
 
 def get_field(elem, field_name):
     value = elem.xpath('./%s' % field_name)[0].text
