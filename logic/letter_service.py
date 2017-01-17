@@ -30,7 +30,7 @@ TZ_EASTERN = tz.gettz('America/New_York')
 PHONE_RE = re.compile('(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})')
 EMAIL_RE = re.compile(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)')
 ZIP4_LINE_RE = re.compile('\d{5}-\d{4}')
-ADDRESS_DC_PARSE_RE = re.compile('(\d+\w?)\s+(.+)\s+Washington,?\s+DC,?\s+(\d+)')
+ADDRESS_DC_PARSE_RE = re.compile('(\w?\d+\w?)\s+(.+)\s+Washington,?\s+DC,?\s+(\d+)')
 
 # xhtml2pdf logs errors like
 # "missing explicit frame definition for content or just static frames"
