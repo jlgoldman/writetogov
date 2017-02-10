@@ -114,7 +114,6 @@ COPY rep (rep_id, first_name, last_name, state_code, district_number, district_c
 607	\N	\N	CA	34	CA34	\N	h	\N	\N	\N	1226 Cannon House Office Building Washington DC, 20515	(202) 225-6235	\N	a	\N
 83	Charles E.	Schumer	NY	\N	\N	D	s	https://www.schumer.senate.gov/contact/email-chuck	\N	http://www.schumer.senate.gov/	322 Hart Senate Office Building Washington DC, 20510	(202) 224-6542	S000148	a	\N
 84	Tim	Scott	SC	\N	\N	R	s	https://www.scott.senate.gov/contact/email-me	\N	http://www.scott.senate.gov/	520 Hart Senate Office Building Washington DC, 20510	(202) 224-6121	S001184	a	\N
-85	Jeff	Sessions	AL	\N	\N	R	s	http://www.sessions.senate.gov/public/index.cfm/contact-jeff	\N	http://www.sessions.senate.gov/	326 Russell Senate Office Building Washington DC, 20510	(202) 224-4124	S001141	a	\N
 86	Jeanne	Shaheen	NH	\N	\N	D	s	http://www.shaheen.senate.gov/contact/	\N	http://www.shaheen.senate.gov	506 Hart Senate Office Building Washington DC, 20510	(202) 224-2841	S001181	a	\N
 87	Richard C.	Shelby	AL	\N	\N	R	s	https://www.shelby.senate.gov/public/index.cfm/emailsenatorshelby	\N	http://www.shelby.senate.gov/	304 Russell Senate Office Building Washington DC, 20510	(202) 224-5744	S000320	a	\N
 608	\N	\N	KS	4	KS04	\N	h	\N	\N	\N	2452 Rayburn House Office Building Washington DC, 20515	(202) 225-6216	\N	a	\N
@@ -157,6 +156,7 @@ COPY rep (rep_id, first_name, last_name, state_code, district_number, district_c
 143	David	Valadao	CA	21	CA21	R	h	\N	\N	\N	1004 Cannon House Office Building Washington DC, 20515	(202) 225-4695	V000129	a	\N
 144	Devin	Nunes	CA	22	CA22	R	h	\N	\N	\N	1013 Cannon House Office Building Washington DC, 20515	(202) 225-2523	N000181	a	\N
 145	Kevin	McCarthy	CA	23	CA23	R	h	\N	\N	\N	2421 Rayburn House Office Building Washington DC, 20515	(202) 225-2915	M001165	a	\N
+609	Luther	Strange	AL	\N	\N	R	s	\N	\N	/senators/115thCongress/Luther_Strange.htm	G-12 Dirksen Senate Office Building Washington DC 20510	(202) 224-4124	S001202	a	\N
 543	Kamala D.	Harris	CA	\N	\N	D	s	\N	\N	/senators/115thCongress/Harris_Kamala.htm	B40B Dirksen Senate Office Building Washington DC, 20510	(202) 224-3553	H001075	a	\N
 115	Martha	McSally	AZ	2	AZ02	R	h	\N	\N	\N	1029 Cannon House Office Building Washington DC, 20515	(202) 225-2542	M001197	a	\N
 133	Mark	DeSaulnier	CA	11	CA11	D	h	\N	\N	\N	327 Longworth House Office Building Washington DC, 20515	(202) 225-2095	D000623	a	\N
@@ -627,7 +627,7 @@ COPY rep (rep_id, first_name, last_name, state_code, district_number, district_c
 -- Name: rep_rep_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jonathangoldman
 --
 
-SELECT pg_catalog.setval('rep_rep_id_seq', 608, true);
+SELECT pg_catalog.setval('rep_rep_id_seq', 609, true);
 
 
 --
