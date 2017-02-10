@@ -7,7 +7,11 @@ def main():
     for db_rep in db_models.Rep.query:
         if db_rep.first_name:
             base_img = base_img_master.copy()
-            rep_img = Image.open('data/rep_images/%d.jpg' % db_rep.rep_id)
+            try:
+                rep_img = Image.open('data/rep_images/%d.jpg' % db_rep.rep_id)
+            except IOError:
+                print 'No image found for rep id %d' % db_rep.rep_id
+                continue
             yoffset = (base_img.size[1] - rep_img.size[1]) / 2
             offset = (yoffset, yoffset)
             base_img.paste(rep_img, offset)
