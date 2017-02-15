@@ -570,8 +570,7 @@ function googlePlaceAutocomplete($parse) {
     require: 'ngModel',
     link: function(scope, element, attrs, model) {
       var options = {
-        types: [],
-        componentRestrictions: {}
+        types: []
       };
       scope.gPlace = new google.maps.places.Autocomplete(element[0], options);
       var selectFn = attrs.onSelect ? $parse(attrs.onSelect) : null;
@@ -591,7 +590,6 @@ function focusOn($parse, $timeout) {
     link: function (scope, element, attrs) {
       var model = $parse(attrs.focusOn);
       scope.$watch(model, function(value) {
-        console.log(value);
         if (value) {
           $timeout(function () {
             element[0].focus();
