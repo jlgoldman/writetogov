@@ -37,9 +37,8 @@ def db_rep_to_api(db_rep):
         db_rep.address_dc[wash_dc_idx:],
     ]
     photo_url = None
-    if db_rep.first_name:
-        # We've grabbed images for all non-vacant reps
-        photo_url = 'https://writetogov.s3.amazonaws.com/images/rep/%d.jpg' % db_rep.rep_id
+    if db_rep.bioguide_id:
+        photo_url = 'https://theunitedstates.io/images/congress/225x275/%s.jpg' % db_rep.bioguide_id
     return rep.Rep(
         rep_id=db_rep.rep_id,
         first_name=db_rep.first_name,
