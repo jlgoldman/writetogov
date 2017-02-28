@@ -26,7 +26,7 @@ def create_db_reminder(email, frequency=R.Frequency.WEEKLY, status=R.Status.ACTI
     return db_reminder
 
 @mock.patch('util.sendgrid_.send_message')
-class ReminderServiceTest(test_base.DatabaseTest):
+class ReminderServiceTest(test_base.DatabaseWithTestdataTest):
     def service(self):
         return reminder_service.ReminderServiceImpl()
 

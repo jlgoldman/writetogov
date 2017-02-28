@@ -208,9 +208,9 @@ class IssueData(DataSet):
         time_created = '2016-11-22 13:26:34.731239-08'
         time_updated = '2016-11-22 13:26:34.731239-08'
 
-def setup_testdata():
+def setup_testdata(connectable):
     dbfixture = SQLAlchemyFixture(
-        engine=db.engine,
+        engine=connectable or db.engine,
         env={
             'RepData': db_models.Rep,
             'DistrictData': db_models.District,
