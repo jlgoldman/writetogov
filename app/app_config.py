@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from config import constants
 from database import db
@@ -28,7 +29,7 @@ def setup_log_handlers(app):
     log_formatter = logging.Formatter(
         '%(asctime)s %(levelname)s [in %(pathname)s:%(lineno)d]: %(message)s')
     log_handlers = [
-        logging.FileHandler(constants.APP_LOG_FILENAME),
+        logging.StreamHandler(sys.stdout) if constants.LOG_TO_STDOUT else logging.FileHandler(constants.APP_LOG_FILENAME),
         new_smtp_log_handler(),
         ]
     app.logger.setLevel(log_level)
@@ -40,7 +41,7 @@ def setup_log_handlers(app):
 
 def new_smtp_log_handler():
     return sendgrid_.SendgridEmailLogHandler(
-        None,  # No server needed, we're using sendgrid instead of STMP
+        None,  # No server needed, we're using sendgrid instead of SMTP
         None,
         constants.MONITORING_NOTIFICATION_EMAILS,
         'WriteToGov Error')

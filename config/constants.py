@@ -31,6 +31,7 @@ FLASK_SECRET_KEY = os.environ.get('FLASK_SECRET_KEY')  # Generate a local secret
 PUBLIC_ID_ENCRYPTION_KEY = os.environ.get('PUBLIC_ID_ENCRYPTION_KEY')  # Generate a local secret with import os; os.urandom(24)
 
 APP_LOG_FILENAME = os.path.join(PROJECTPATH, 'app.log')
+LOG_TO_STDOUT = parse_bool(os.environ.get('LOG_TO_STDOUT'))
 
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
 
