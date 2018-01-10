@@ -49,6 +49,7 @@ pyOpenSSL==16.2.0
 PyPDF2==1.26.0
 python-crfsuite==0.8.4
 python-dateutil==2.6.0
+python-dotenv==0.7.1
 python-http-client==2.2.1
 reportlab==3.3.0
 requests==2.12.1

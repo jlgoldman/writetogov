@@ -1,9 +1,6 @@
-# Create a file called config/constants_override.py to override
-# any of these values with ones specific to your environment.
-# constants_override.py is kept out of git so it can contain
-# secret keys and local settings that aren't appropriate for the repo.
+# Create a .env file with secret keys and such.
 #
-# Suggested default values for constants_override.py:
+# Suggested default values for .env:
 #
 # DEBUG = True
 # HOST = 'localhost:5000'
@@ -14,19 +11,28 @@
 
 import os
 
-DEBUG = False  # Set to True for development
+import dotenv
 
-HOST = None  # Set to e.g. localhost:5000 or a local proxy like ngrok
+dotenv_filename = dotenv.find_dotenv()
+if dotenv_filename:
+    dotenv.load_dotenv(dotenv_filename)
+
+def parse_bool(env_value):
+    return env_value is not None and env_value.lower() not in ('0', 'false')
+
+DEBUG = parse_bool(os.environ.get('DEBUG'))  # Set to True for development
+
+HOST = os.environ.get('HOST')  # Set to e.g. localhost:5000 or a local proxy like ngrok
 HTTPS = True  # Set to False if using localhost in development
 
 PROJECTPATH = os.environ.get('PROJECTPATH')
 
-FLASK_SECRET_KEY = None  # Generate a local secret with import os; os.urandom(24)
-PUBLIC_ID_ENCRYPTION_KEY = None  # Generate a local secret with import os; os.urandom(24)
+FLASK_SECRET_KEY = os.environ.get('FLASK_SECRET_KEY')  # Generate a local secret with import os; os.urandom(24)
+PUBLIC_ID_ENCRYPTION_KEY = os.environ.get('PUBLIC_ID_ENCRYPTION_KEY')  # Generate a local secret with import os; os.urandom(24)
 
 APP_LOG_FILENAME = os.path.join(PROJECTPATH, 'app.log')
 
-SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/writetogov'
+SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
 
 TEMPLATE_ROOT = os.path.join(PROJECTPATH, 'templates')
 STATIC_ROOT = os.path.join(PROJECTPATH, 'static')
@@ -39,19 +45,14 @@ REP_AUTOCOMPLETE_DATA_FNAME = os.path.join(PROJECTPATH, 'data/rep_autocomplete.2
 # Google Places API Web Service
 GOOGLE_MAPS_API_KEY = None
 
-PROPUBLICA_API_KEY = None  # Only needed for one-time imports of data, not needed for running the server.
-SENGRID_API_KEY = None  # Only needed if testing email sending for reminders and subscriptions
-STRIPE_SECRET_KEY = None  # Only needed if testing billing for mailing letters using Lob
-STRIPE_PUBLISHABLE_KEY = None  # Only needed if testing billing for mailing letters using Lob
-LOB_API_KEY = None  # Only needed if testing Lob API calls for mailing letters.
+PROPUBLICA_API_KEY = os.environ.get('PROPUBLICA_API_KEY')  # Only needed for one-time imports of data, not needed for running the server.
+SENGRID_API_KEY = os.environ.get('SENGRID_API_KEY')  # Only needed if testing email sending for reminders and subscriptions
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')  # Only needed if testing billing for mailing letters using Lob
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')  # Only needed if testing billing for mailing letters using Lob
+LOB_API_KEY = os.environ.get('LOB_API_KEY') # Only needed if testing Lob API calls for mailing letters.
 
-INTERNAL_IPS = ()
-MONITORING_NOTIFICATION_EMAILS = ()
+INTERNAL_IPS = os.environ.get('INTERNAL_IPS', '').split(',')
+MONITORING_NOTIFICATION_EMAILS = os.environ.get('MONITORING_NOTIFICATION_EMAILS', '').split(',')
 
 def abspath(*path_elements):
     return os.path.join(PROJECTPATH, *path_elements)
-
-try:
-    from constants_override import *
-except ImportError:
-    pass

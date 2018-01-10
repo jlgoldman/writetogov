@@ -44,3 +44,5 @@ constants_override.py
 
 # Mac OS
 .DS_Store
+
+.env
