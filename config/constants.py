@@ -44,7 +44,7 @@ REP_AUTOCOMPLETE_DATA_FNAME = os.path.join(PROJECTPATH, 'data/rep_autocomplete.2
 # Register for a Google Cloud Console project, go to the Credentials section,
 # generate an API key, and enable Google Maps JavaScript API and
 # Google Places API Web Service
-GOOGLE_MAPS_API_KEY = None
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 PROPUBLICA_API_KEY = os.environ.get('PROPUBLICA_API_KEY')  # Only needed for one-time imports of data, not needed for running the server.
 SENGRID_API_KEY = os.environ.get('SENGRID_API_KEY')  # Only needed if testing email sending for reminders and subscriptions
