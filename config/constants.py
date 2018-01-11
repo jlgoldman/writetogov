@@ -47,7 +47,7 @@ REP_AUTOCOMPLETE_DATA_FNAME = os.path.join(PROJECTPATH, 'data/rep_autocomplete.2
 GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 PROPUBLICA_API_KEY = os.environ.get('PROPUBLICA_API_KEY')  # Only needed for one-time imports of data, not needed for running the server.
-SENGRID_API_KEY = os.environ.get('SENGRID_API_KEY')  # Only needed if testing email sending for reminders and subscriptions
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')  # Only needed if testing email sending for reminders and subscriptions
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')  # Only needed if testing billing for mailing letters using Lob
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')  # Only needed if testing billing for mailing letters using Lob
 LOB_API_KEY = os.environ.get('LOB_API_KEY') # Only needed if testing Lob API calls for mailing letters.
