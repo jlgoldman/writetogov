@@ -25,7 +25,7 @@ ipython-genutils==0.1.0
 itsdangerous==0.24
 Jinja2==2.8
 lob==2.26
-lxml==3.6.4
+lxml==4.6.2
 MarkupSafe==0.23
 Metafone==0.5
 mock==2.0.0
