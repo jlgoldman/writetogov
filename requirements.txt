@@ -2,7 +2,7 @@
 appier==1.7.39
 appnope==0.1.0
 backports.shutil-get-terminal-size==1.0.0
-certifi==2016.9.26
+certifi==2022.12.7
 cffi==1.9.1
 click==6.6
 cryptography==1.5.3
